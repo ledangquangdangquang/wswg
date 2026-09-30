@@ -188,6 +188,8 @@ a.btn { display: inline-flex; align-items: center; text-decoration: none; }
 .notice { margin: var(--space-lg) 0; padding: var(--space-md) var(--space-lg); border: 1px solid var(--color-rule-2); border-radius: var(--radius-md); max-width: 64ch; }
 .notice p { margin: 0; color: var(--color-ink-2); }
 .notice p + p { margin-top: var(--space-xs); color: var(--color-neutral); }
+.notice.exam { margin: var(--space-lg) 0 0; }
+.notice strong { color: var(--color-ink); font-weight: 600; }
 
 .empty { padding: var(--space-2xl) 0; color: var(--color-neutral); }
 
@@ -247,6 +249,7 @@ const [wy, wm, wd] = window.TKB.week1.split('-').map(Number);
 const WEEK1 = new Date(wy, wm - 1, wd);            // thứ Hai tuần 1, giờ địa phương
 const SOURCE = `TKB ${window.TKB.term} · cập nhật ${window.TKB.updated}`;
 const ISSUES = 'https://github.com/ledangquangdangquang/wswg/issues/new';  // nút "Báo sai" mở issue điền sẵn
+const GOATCOUNTER = '';  // tên site GoatCounter (xxx trong xxx.goatcounter.com); để trống = không đếm
 const DAY = 864e5;
 
 const { rooms, sessions } = window.TKB;
@@ -328,7 +331,11 @@ function render() {
   $('headline').innerHTML = `<b>${free}</b> / ${total} phòng trống`;
   $('sub').textContent = `${dayName}, ${hm(t)} · ${week >= 1 ? 'tuần ' + week : 'chưa vào kỳ'}${live ? ' · tự cập nhật mỗi phút' : ''}`;
 
-  $('list').innerHTML = groups.size ? [...groups].map(([b, list]) => `
+  const exam = window.TKB.exam.includes(week) ? `<div class="notice exam">
+      <p><strong>Tuần ${week} có thể là tuần thi.</strong> TKB tuần này chỉ có ít lớp nên nhiều phòng hiện trống, nhưng có thể đang được dùng để thi.</p>
+      <p>Xem lịch thi trước khi vào phòng.</p>
+    </div>` : '';
+  $('list').innerHTML = exam + (groups.size ? [...groups].map(([b, list]) => `
     <section class="building">
       <h2>Tòa ${esc(b)} <small>${list.filter(x => !x[1].busy).length}/${list.length} trống</small></h2>
       <div class="grid">${list.map(([i, st]) => st.busy ? `
@@ -338,7 +345,7 @@ function render() {
         <button type="button" class="room free" data-i="${i}"><span class="name">${esc(rooms[i])}</span>
           <span class="st">Trống · ${st.until === Infinity ? 'hết ngày' : 'đến ' + hm(st.until)}</span></button>`).join('')}
       </div>
-    </section>`).join('') : '<p class="empty">Không có phòng nào khớp bộ lọc.</p>';
+    </section>`).join('') : '<p class="empty">Không có phòng nào khớp bộ lọc.</p>');
 }
 
 // Lịch cả ngày (cùng thứ + tuần đang xem) của 1 phòng
@@ -384,6 +391,19 @@ sysDark.addEventListener('change', themeLabel);
 themeLabel();
 
 $('foot').textContent = `${SOURCE} · ${rooms.length} phòng học · tuần 1 bắt đầu ${WEEK1.toLocaleDateString('vi-VN')}`;
+
+// Đếm lượt truy cập (GoatCounter): gửi 1 lượt xem, rồi hiện tổng ở chân trang.
+// Hiện số cần bật "Allow adding visitor counts on your website" trong Settings của GoatCounter.
+if (GOATCOUNTER) {
+  const gc = document.createElement('script');
+  gc.async = true; gc.src = 'https://gc.zgo.at/count.js';
+  gc.dataset.goatcounter = `https://${GOATCOUNTER}.goatcounter.com/count`;
+  document.head.append(gc);
+  fetch(`https://${GOATCOUNTER}.goatcounter.com/counter/TOTAL.json`)
+    .then(r => r.ok ? r.json() : Promise.reject())
+    .then(j => { $('foot').textContent += ` · ${j.count} lượt xem`; })
+    .catch(() => {});  // không lấy được số thì thôi, không ảnh hưởng app
+}
 $('at').addEventListener('input', () => { live = false; render(); });
 $('now').addEventListener('click', () => { live = true; render(); });
 $('controls').addEventListener('input', e => { if (e.target.id !== 'at') render(); });

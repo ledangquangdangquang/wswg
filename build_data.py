@@ -87,6 +87,18 @@ def name(r):
     return r[6] if ("?" in vi or "\ufffd" in vi) and r[6] else vi
 
 
+def exam_weeks(sessions):
+    """Đoán tuần thi: tuần có lớp nhưng ít hơn 30% tuần đông nhất, nằm sau tuần học đầu tiên.
+    Kỳ 20261 cho ra [10, 19, 20] (thi giữa kỳ + cuối kỳ). Tuần 1 lác đác lớp nên bị bỏ qua."""
+    count = {}
+    for s in sessions:
+        for w in range(s[4].bit_length()):
+            if s[4] >> w & 1:
+                count[w] = count.get(w, 0) + 1
+    dense = [w for w, n in count.items() if n >= 0.3 * max(count.values())]
+    return sorted(w for w, n in count.items() if w > min(dense) and w not in dense)
+
+
 def build(rows):
     rooms, sessions = {}, []
     for r in rows:
@@ -112,12 +124,15 @@ if __name__ == "__main__":
     assert minutes("0645") == 405
     assert all(ROOM_RE.match(r) for r in ["D9-102", "D3-5-301", "C7-E303", "C10B-205", "NhaT-KT-205", "GĐ-B1"])
     assert not any(ROOM_RE.match(r) for r in ["NULL", "Online", "SVĐ 1", "SanB13", "San KTX", "TTB4", "D2B"])
+    fake = lambda w, n: [[0, 2, 0, 1, 1 << w]] * n
+    assert exam_weeks(fake(1, 2) + fake(2, 100) + fake(3, 90) + fake(4, 10) + fake(5, 95) + fake(6, 20)) == [4, 6]
     assert title_info([[""], ["THỜI KHÓA BIỂU KỲ 20261 - CẬP NHẬT NGÀY 11.09.2026"]]) == ("20261", "11.09.2026")
     assert title_info([["TH?I KH\ufffdA BI?U K? 20261 - C?P NH?T NG\ufffdY 1.9.2026"]]) == ("20261", "1.9.2026")
 
     ap = argparse.ArgumentParser(description="Thời khóa biểu -> data.js")
     ap.add_argument("file", nargs="?")
     ap.add_argument("--week1", help="thứ Hai của tuần 1, dạng YYYY-MM-DD")
+    ap.add_argument("--exam-weeks", help="tuần thi, vd '10,19-20'; bỏ trống thì tự đoán từ số lớp mỗi tuần")
     args = ap.parse_args()
     path = args.file or max(glob.glob("TKB*.xlsx") + glob.glob("TKB*.csv"), key=os.path.getmtime)
 
@@ -130,7 +145,9 @@ if __name__ == "__main__":
     table = read_table(path)
     term, updated = title_info(table)
     data = {"term": term, "updated": updated, "week1": week1, **build(table)}
+    data["exam"] = weeks(args.exam_weeks) if args.exam_weeks else exam_weeks(data["sessions"])
     with open("data.js", "w", encoding="utf-8") as f:
         f.write("window.TKB=" + json.dumps(data, ensure_ascii=False, separators=(",", ":")) + ";\n")
     print(f"{path}: kỳ {term}, cập nhật {updated}, tuần 1 = {week1}, có lớp tuần {data['weeks'][0]}–{data['weeks'][1]}")
+    print(f"Tuần thi: {', '.join(map(str, data['exam'])) or 'không có'}  (sai thì chạy lại với --exam-weeks)")
     print(f"{len(data['rooms'])} phòng, {len(data['sessions'])} buổi -> data.js")

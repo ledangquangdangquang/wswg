@@ -31,6 +31,7 @@ Mở thẳng `index.html` bằng trình duyệt là chạy được, không cầ
    python3 build_data.py --week1 2027-09-06   # thứ Hai của tuần 1
    ```
    Những lần sau script tự dùng lại ngày này. Không cần sửa `index.html`.
+   Script cũng in ra các tuần thi nó đoán được. Kiểm tra lại, sai thì thêm `--exam-weeks`.
 4. Commit rồi push lên `main`. GitHub Pages sẽ tự cập nhật sau khoảng một phút.
 
 ## Cách tính
@@ -38,6 +39,7 @@ Mở thẳng `index.html` bằng trình duyệt là chạy được, không cầ
 - Tuần hiện tại được tính từ ngày bắt đầu tuần 1 (năm học 2026–2027: thứ Hai 07/09/2026). Một phòng bị coi là "đang học" nếu có lớp đúng thứ, đúng tuần và đúng khung giờ.
 - Chỉ tính phòng học có mã dạng Tòa-Số (D9-102, C7-E303, C10B-205…). Sân, SVĐ, bể bơi và lớp Online không được tính.
 - Lớp bị huỷ được bỏ qua.
+- **Tuần thi** (kỳ 20261: tuần 10, 19, 20) vẫn hiện phòng như bình thường, nhưng có thêm cảnh báo rằng phòng báo trống có thể đang dùng để thi. Script tự đoán tuần thi là những tuần có ít lớp. Đoán sai thì chạy lại với `--exam-weeks 10,19-20`.
 - Nếu thời điểm đang xem nằm ngoài các tuần có trong TKB (trước khi vào kỳ hoặc sau khi hết kỳ), app hiện cảnh báo thay cho danh sách phòng, không báo "trống hết".
 - App chỉ biết những gì có trong TKB. Họp, thi hay mượn phòng đột xuất không có trong dữ liệu, nên "trống" chỉ có nghĩa là không có lớp theo lịch.
 

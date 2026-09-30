@@ -16,7 +16,8 @@ python3 build_data.py "TKB20261-FULL.xlsx"   # không truyền tham số thì l�
 python3 build_data.py --week1 2027-09-06     # chỉ khi đổi năm học
 ```
 
-Không còn cấu hình nào trong `index.html`. `data.js` chứa `term` và `updated` (regex bám vào số ở dòng tiêu đề, nên đọc được cả CSV mất dấu) cùng `week1` (lấy từ `--week1`, không truyền thì dùng lại giá trị trong `data.js` cũ, và phải là thứ Hai). `index.html` tạo `WEEK1` và `SOURCE` từ các giá trị này. `weeks: [đầu, cuối]` là khoảng tuần có lớp. Ngoài khoảng này `render()` hiện `.notice` và không liệt kê phòng.
+Không còn cấu hình nào trong `index.html`. `data.js` chứa `term` và `updated` (regex bám vào số ở dòng tiêu đề, nên đọc được cả CSV mất dấu) cùng `week1` (lấy từ `--week1`, không truyền thì dùng lại giá trị trong `data.js` cũ, và phải là thứ Hai). `index.html` tạo `WEEK1` và `SOURCE` từ các giá trị này. `weeks: [đầu, cuối]` là khoảng tuần có lớp. Ngoài khoảng này `render()` hiện `.notice` và không liệt kê phòng. `exam` là danh sách tuần thi, lấy từ `--exam-weeks` hoặc do `exam_weeks()` đoán (tuần có < 30% số lớp của tuần đông nhất, nằm sau tuần học đầu tiên). Tuần thi vẫn liệt kê phòng như thường nhưng thêm `.notice.exam` ở đầu danh sách. Khác với `week1`, `exam` không được giữ lại giữa các lần build.
+- Đếm lượt truy cập: đặt hằng số `GOATCOUNTER` trong `index.html` (để trống thì tắt). Tổng lượt xem lấy từ `/counter/TOTAL.json` và hiện ở footer.
 
 ## Dữ liệu TKB: những điểm cần biết
 
