@@ -223,6 +223,9 @@ dialog::backdrop { background: var(--color-scrim); }
 .day li.now { box-shadow: inset 3px 0 0 var(--color-accent); background: var(--color-accent-soft); }
 .day li.past { opacity: 0.5; }
 .day .none { display: block; color: var(--color-neutral); }
+#map { width: min(960px, calc(100% - 2 * var(--space-md))); }
+#map img { display: block; width: 100%; height: auto; }
+.acts { display: flex; gap: var(--space-sm); }
 .report { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-sm); padding: var(--space-md); border-top: 1px solid var(--color-rule); font-size: var(--text-sm); color: var(--color-neutral); }
 
 footer { padding: var(--space-xl) 0; font-size: var(--text-sm); color: var(--color-neutral); }
@@ -233,7 +236,10 @@ footer { padding: var(--space-xl) 0; font-size: var(--text-sm); color: var(--col
 <body>
 <header class="nav"><div class="wrap">
   <div class="mark">Phòng trống BK</div>
-  <button type="button" class="btn" id="theme"></button>
+  <div class="acts">
+    <button type="button" class="btn" id="map-open">Bản đồ</button>
+    <button type="button" class="btn" id="theme"></button>
+  </div>
 </div></header>
 
 <main class="wrap">
@@ -275,6 +281,14 @@ footer { padding: var(--space-xl) 0; font-size: var(--text-sm); color: var(--col
     <span id="report-q"></span>
     <a class="btn" id="report" target="_blank" rel="noopener">Báo sai</a>
   </div>
+</dialog>
+
+<dialog id="map" aria-labelledby="map-title">
+  <div class="dlg-head">
+    <h2 id="map-title">Bản đồ HUST</h2>
+    <button type="button" class="btn" id="map-close">Đóng</button>
+  </div>
+  <img src="maps-hust.webp" alt="Bản đồ các tòa nhà Đại học Bách khoa Hà Nội" loading="lazy">
 </dialog>
 
 <script src="data.js"></script>
@@ -426,6 +440,9 @@ function openDay(i) {
 $('list').addEventListener('click', e => { const b = e.target.closest('.row'); if (b) openDay(+b.dataset.i); });
 $('dlg-close').addEventListener('click', () => $('dlg').close());
 $('dlg').addEventListener('click', e => { if (e.target === $('dlg')) $('dlg').close(); });  // bấm ra ngoài để đóng
+$('map-open').addEventListener('click', () => $('map').showModal());
+$('map-close').addEventListener('click', () => $('map').close());
+$('map').addEventListener('click', e => { if (e.target === $('map')) $('map').close(); });
 
 // Sáng / tối
 const root = document.documentElement, sysDark = matchMedia('(prefers-color-scheme: dark)');
