@@ -263,11 +263,14 @@ function weekOf(d) {
   return Math.floor(Math.round((day - WEEK1) / DAY) / 7) + 1;
 }
 
+// s[4] là bitmask tuần; kỳ hè có tuần 45–49 nên không dùng được `&` (chỉ 32 bit)
+const inWeek = (s, week) => week >= 1 && Math.floor(s[4] / 2 ** week) % 2 === 1;
+
 // Trạng thái 1 phòng tại (thứ, tuần, phút): {busy, cls, until}
 function status(i, thu, week, t) {
   let cur = null, next = Infinity;
   for (const s of byRoom[i]) {
-    if (s[1] !== thu || week < 1 || week > 30 || !(s[4] & (1 << week))) continue;
+    if (s[1] !== thu || !inWeek(s, week)) continue;
     if (s[2] <= t && t < s[3]) cur = cur && cur[3] > s[3] ? cur : s;
     else if (s[2] > t && s[2] < next) next = s[2];
   }
@@ -288,7 +291,7 @@ function render() {
   for (const i of order) {
     const r = rooms[i];
     if (bld && building(r) !== bld) continue;
-    if (q && !r.includes(q)) continue;
+    if (q && !r.toUpperCase().includes(q)) continue;
     const st = status(i, thu, week, t);
     total++; if (!st.busy) free++;
     if (mode === 'free' && st.busy || mode === 'busy' && !st.busy) continue;
@@ -318,7 +321,7 @@ function render() {
 function openDay(i) {
   const { thu, week, t, dayName, date } = ctx;
   const day = byRoom[i]
-    .filter(s => s[1] === thu && week >= 1 && week <= 30 && s[4] & (1 << week))
+    .filter(s => s[1] === thu && inWeek(s, week))
     .sort((a, b) => a[2] - b[2] || a[3] - b[3]);
   $('dlg-title').textContent = rooms[i];
   $('dlg-meta').textContent = `${dayName} · ${date} · ${week >= 1 ? 'tuần ' + week : 'chưa vào kỳ'}`;

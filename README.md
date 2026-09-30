@@ -20,10 +20,10 @@ Mở thẳng `index.html` bằng trình duyệt là chạy được, không cầ
 
 ## Cập nhật thời khóa biểu
 
-1. Xuất TKB từ Excel ra file CSV, **chọn dạng UTF-8** để tên môn không bị lỗi dấu.
-2. Chép file CSV vào thư mục này, rồi chạy:
+1. Chép file TKB vào thư mục này. **Nên dùng thẳng file `.xlsx`** vì file này không bao giờ bị lỗi dấu. Nếu dùng CSV thì phải lưu bằng *CSV UTF-8 (Comma delimited)*. Kiểu *CSV (Comma delimited)* thường sẽ biến chữ có dấu thành `?`, và khi đó app phải hiện tên môn bằng tiếng Anh.
+2. Chạy:
    ```sh
-   python3 build_data.py "TKB20261-FULL.csv"
+   python3 build_data.py "TKB20261-FULL.xlsx"   # không truyền tên file thì lấy file TKB* mới nhất
    ```
    Lệnh này tạo lại `data.js`. Chỉ cần Python 3, không phải cài thêm thư viện.
 3. Sang kỳ mới thì sửa `WEEK1` (ngày thứ Hai của tuần 1) và `SOURCE` ở đầu thẻ `<script>` trong `index.html`.
@@ -32,7 +32,7 @@ Mở thẳng `index.html` bằng trình duyệt là chạy được, không cầ
 ## Cách tính
 
 - Tuần hiện tại được tính từ `WEEK1` (kỳ 20261: thứ Hai 07/09/2026). Một phòng bị coi là "đang học" nếu có lớp đúng thứ, đúng tuần và đúng khung giờ.
-- Chỉ tính phòng học có mã dạng Tòa-Số (D9-102, D3-5-301, TC-301…). Sân, SVD, bể bơi và phòng thí nghiệm ngoài hệ thống này không được tính.
+- Chỉ tính phòng học có mã dạng Tòa-Số (D9-102, C7-E303, C10B-205…). Sân, SVĐ, bể bơi và lớp Online không được tính.
 - Lớp bị huỷ được bỏ qua.
 - App chỉ biết những gì có trong TKB. Họp, thi hay mượn phòng đột xuất không có trong dữ liệu, nên "trống" chỉ có nghĩa là không có lớp theo lịch.
 
@@ -41,6 +41,6 @@ Mở thẳng `index.html` bằng trình duyệt là chạy được, không cầ
 | File | Vai trò |
 | --- | --- |
 | `index.html` | Toàn bộ giao diện (HTML + CSS + JS) |
-| `data.js` | Dữ liệu sinh từ CSV, không sửa tay |
-| `build_data.py` | Chuyển CSV thành `data.js` |
-| `TKB*.csv` | Thời khóa biểu gốc |
+| `data.js` | Dữ liệu sinh từ file TKB, không sửa tay |
+| `build_data.py` | Chuyển file TKB thành `data.js` |
+| `TKB*.xlsx` | Thời khóa biểu gốc |
