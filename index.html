@@ -6,76 +6,87 @@
 <title>Phòng trống BK</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script>try { const t = localStorage.getItem('theme'); if (t) document.documentElement.dataset.theme = t; } catch {}</script>
 <style>
-/* Hallmark · genre: modern-minimal · macrostructure: Catalogue · theme: Cobalt · enrichment: none · nav: N9 edge-aligned · footer: Ft2 inline
- * tone: utilitarian · anchor hue: 256 (cobalt) · audience: sinh viên BK tìm phòng tự học
+/* Hallmark · genre: editorial (utilitarian) · macrostructure: Map / Diagram (day timeline per room) · theme: custom
+ * vibe: "bảng giờ tàu, giấy ấm, vạch đỏ bây giờ" · paper oklch(97.5% 0.008 85) · accent oklch(57% 0.19 32) vermilion
+ * display+body: Be Vietnam Pro · mono: JetBrains Mono (mã phòng, giờ) · axes: light / grotesk-sans / warm
+ * nav: N9 edge-aligned · footer: Ft2 inline · enrichment: none (the timeline IS the diagram)
  */
 :root {
-  --color-paper:    oklch(98.5% 0.004 250);
-  --color-paper-2:  oklch(95.5% 0.006 252);
-  --color-rule:     oklch(89% 0.008 255);
-  --color-rule-2:   oklch(80% 0.010 256);
-  --color-neutral:  oklch(52% 0.014 257);
-  --color-ink-2:    oklch(34% 0.018 257);
-  --color-ink:      oklch(24% 0.020 258);
-  --color-accent:   oklch(52% 0.20 256);
-  --color-accent-soft: oklch(95% 0.03 256);
-  --color-accent-ink:  oklch(98.5% 0.004 250);
-  --color-focus:    oklch(52% 0.20 256);
-  --color-busy-bg:  oklch(95.5% 0.006 252);
-  --color-scrim:    oklch(24% 0.02 258 / 0.35);
+  --color-paper:      oklch(97.5% 0.008 85);
+  --color-paper-2:    oklch(94.5% 0.010 85);
+  --color-rule:       oklch(89% 0.012 80);
+  --color-rule-2:     oklch(79% 0.014 80);
+  --color-neutral:    oklch(50% 0.015 70);
+  --color-ink-2:      oklch(33% 0.015 65);
+  --color-ink:        oklch(21% 0.015 60);
+  --color-track:      oklch(95% 0.010 85);   /* nền dòng thời gian */
+  --color-track-past: oklch(90.5% 0.013 82); /* phần đã qua trong ngày */
+  --color-block:      oklch(76% 0.030 72);   /* lớp sắp tới / đã qua */
+  --color-block-now:  oklch(30% 0.020 60);   /* lớp đang diễn ra */
+  --color-accent:     oklch(57% 0.19 32);    /* vạch "bây giờ", số phòng trống */
+  --color-accent-soft: oklch(94% 0.03 40);
+  --color-focus:      oklch(57% 0.19 32);
+  --color-scrim:      oklch(21% 0.015 60 / 0.4);
   color-scheme: light;
 
-  --font-display: "Space Grotesk", system-ui, sans-serif;
-  --font-body:    "Inter", system-ui, sans-serif;
-  --font-mono:    "JetBrains Mono", ui-monospace, monospace;
+  --font-body: "Be Vietnam Pro", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
   --text-xs: 0.75rem; --text-sm: 0.875rem; --text-md: 1rem; --text-lg: 1.25rem;
-  --text-display: clamp(2.25rem, 6vw + 0.5rem, 4.5rem);
+  --text-display: clamp(2rem, 4vw + 1rem, 3.5rem);
 
   --space-2xs: 4px; --space-xs: 8px; --space-sm: 12px; --space-md: 16px;
   --space-lg: 24px; --space-xl: 40px; --space-2xl: 64px;
 
-  --radius-sm: 6px; --radius-md: 10px;
+  --radius-sm: 4px; --radius-md: 8px;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --dur-fast: 120ms;
+
+  /* Cột của mỗi dòng phòng: mã | trạng thái | dòng thời gian */
+  --col-code: 7.5rem;
+  --col-st: 9rem;
 }
 
 /* Dark: theo hệ thống, nút trên nav ghi đè bằng data-theme */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --color-paper:    oklch(17% 0.012 258);
-    --color-paper-2:  oklch(21% 0.014 258);
-    --color-busy-bg:  oklch(14.5% 0.010 258);
-    --color-rule:     oklch(28% 0.014 258);
-    --color-rule-2:   oklch(38% 0.016 258);
-    --color-neutral:  oklch(68% 0.014 257);
-    --color-ink-2:    oklch(84% 0.010 255);
-    --color-ink:      oklch(95% 0.006 250);
-    --color-accent:   oklch(72% 0.15 256);
-    --color-accent-soft: oklch(26% 0.06 256);
-    --color-accent-ink:  oklch(17% 0.012 258);
-    --color-focus:    oklch(74% 0.15 256);
-    --color-scrim:    oklch(8% 0.01 258 / 0.6);
+    --color-paper:      oklch(18% 0.010 70);
+    --color-paper-2:    oklch(22% 0.012 70);
+    --color-rule:       oklch(29% 0.012 70);
+    --color-rule-2:     oklch(40% 0.014 70);
+    --color-neutral:    oklch(70% 0.014 75);
+    --color-ink-2:      oklch(86% 0.010 80);
+    --color-ink:        oklch(95% 0.008 85);
+    --color-track:      oklch(21% 0.010 70);
+    --color-track-past: oklch(25% 0.012 70);
+    --color-block:      oklch(42% 0.025 70);
+    --color-block-now:  oklch(88% 0.020 80);
+    --color-accent:     oklch(70% 0.16 35);
+    --color-accent-soft: oklch(28% 0.05 35);
+    --color-focus:      oklch(72% 0.16 35);
+    --color-scrim:      oklch(8% 0.01 70 / 0.6);
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --color-paper:    oklch(17% 0.012 258);
-  --color-paper-2:  oklch(21% 0.014 258);
-  --color-busy-bg:  oklch(14.5% 0.010 258);
-  --color-rule:     oklch(28% 0.014 258);
-  --color-rule-2:   oklch(38% 0.016 258);
-  --color-neutral:  oklch(68% 0.014 257);
-  --color-ink-2:    oklch(84% 0.010 255);
-  --color-ink:      oklch(95% 0.006 250);
-  --color-accent:   oklch(72% 0.15 256);
-  --color-accent-soft: oklch(26% 0.06 256);
-  --color-accent-ink:  oklch(17% 0.012 258);
-  --color-focus:    oklch(74% 0.15 256);
-  --color-scrim:    oklch(8% 0.01 258 / 0.6);
+  --color-paper:      oklch(18% 0.010 70);
+  --color-paper-2:    oklch(22% 0.012 70);
+  --color-rule:       oklch(29% 0.012 70);
+  --color-rule-2:     oklch(40% 0.014 70);
+  --color-neutral:    oklch(70% 0.014 75);
+  --color-ink-2:      oklch(86% 0.010 80);
+  --color-ink:        oklch(95% 0.008 85);
+  --color-track:      oklch(21% 0.010 70);
+  --color-track-past: oklch(25% 0.012 70);
+  --color-block:      oklch(42% 0.025 70);
+  --color-block-now:  oklch(88% 0.020 80);
+  --color-accent:     oklch(70% 0.16 35);
+  --color-accent-soft: oklch(28% 0.05 35);
+  --color-focus:      oklch(72% 0.16 35);
+  --color-scrim:      oklch(8% 0.01 70 / 0.6);
   color-scheme: dark;
 }
 
@@ -88,45 +99,39 @@ body {
 }
 .wrap { max-width: 1200px; margin: 0 auto; padding: 0 var(--space-md); }
 
-/* Nav — edge-aligned, hairline below */
-.nav { border-bottom: 1px solid var(--color-rule); }
+/* Nav */
 .nav .wrap { display: flex; justify-content: space-between; align-items: center; min-height: 56px; gap: var(--space-md); }
-.mark { font: 600 var(--text-md)/1 var(--font-display); color: var(--color-ink); letter-spacing: -0.01em; white-space: nowrap; }
-.mark span { color: var(--color-accent); }
-.nav-right { display: flex; align-items: center; gap: var(--space-sm); }
-.nav-right .btn { height: 32px; }
-#clock { display: none; }
-@media (min-width: 560px) { #clock { display: block; } }
-.meta { font: 500 var(--text-xs)/1 var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-neutral); white-space: nowrap; }
+.mark { font: 700 var(--text-md)/1 var(--font-body); color: var(--color-ink); white-space: nowrap; }
 
-/* Summary */
+/* Tóm tắt */
 .summary { padding: var(--space-xl) 0 var(--space-lg); }
 .summary h1 {
-  margin: 0; font: 600 var(--text-display)/1 var(--font-display); color: var(--color-ink);
-  letter-spacing: -0.035em; overflow-wrap: anywhere; min-width: 0;
+  margin: 0; font: 700 var(--text-display)/1.05 var(--font-body); color: var(--color-ink);
+  letter-spacing: -0.03em; overflow-wrap: anywhere; min-width: 0;
 }
-.summary h1 b { color: var(--color-accent); font-weight: 600; }
-.summary p { margin: var(--space-sm) 0 0; color: var(--color-neutral); }
+.summary h1 b { color: var(--color-accent); font-weight: 700; }
+.summary p { margin: var(--space-xs) 0 0; color: var(--color-neutral); }
 
-/* Controls */
-.controls { display: flex; flex-wrap: wrap; gap: var(--space-xs); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--color-rule); }
-.field { display: flex; flex-direction: column; gap: var(--space-2xs); min-width: 0; flex: 1 1 160px; }
-.field label { font: 500 var(--text-xs)/1 var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-neutral); }
+/* Điều khiển */
+.controls { display: flex; flex-wrap: wrap; gap: var(--space-sm) var(--space-xs); align-items: flex-end; }
+.field { display: flex; flex-direction: column; gap: var(--space-2xs); min-width: 0; flex: 1 1 150px; }
+.field label { font-size: var(--text-sm); color: var(--color-neutral); }
 input, select, .btn {
   font: 500 var(--text-sm)/1 var(--font-body); color: var(--color-ink);
   height: 40px; padding: 0 var(--space-sm); border: 1px solid var(--color-rule-2);
   border-radius: var(--radius-sm); background: var(--color-paper); min-width: 0; width: 100%;
   transition: border-color var(--dur-fast) var(--ease-out);
 }
-input:hover, select:hover, .btn:hover { border-color: var(--color-neutral); }
-input:focus-visible, select:focus-visible, .btn:focus-visible, .seg input:focus-visible + span {
+input:hover, select:hover, .btn:hover { border-color: var(--color-ink-2); }
+input:focus-visible, select:focus-visible, .btn:focus-visible, .seg input:focus-visible + span, .row:focus-visible {
   outline: 2px solid var(--color-focus); outline-offset: 2px;
 }
-.btn { width: auto; cursor: pointer; white-space: nowrap; align-self: flex-end; }
+.btn { width: auto; cursor: pointer; white-space: nowrap; }
 .btn:active { transform: translateY(1px); }
-.btn:disabled { opacity: 0.45; cursor: default; transform: none; border-color: var(--color-rule-2); }
+.btn:disabled { opacity: 0.4; cursor: default; transform: none; border-color: var(--color-rule-2); }
+a.btn { display: inline-flex; align-items: center; text-decoration: none; }
 
-.seg { display: flex; border: 1px solid var(--color-rule-2); border-radius: var(--radius-sm); overflow: hidden; height: 40px; flex: 1 1 240px; align-self: flex-end; }
+.seg { display: flex; border: 1px solid var(--color-rule-2); border-radius: var(--radius-sm); overflow: hidden; height: 40px; flex: 1 1 240px; }
 .seg label { flex: 1; display: flex; position: relative; }
 .seg input { position: absolute; opacity: 0; width: 1px; height: 1px; }
 .seg span {
@@ -138,28 +143,66 @@ input:focus-visible, select:focus-visible, .btn:focus-visible, .seg input:focus-
 .seg span:hover { background: var(--color-paper-2); }
 .seg input:checked + span { background: var(--color-ink); color: var(--color-paper); }
 
-/* Catalogue — one band per building */
-.building { padding: var(--space-lg) 0; border-bottom: 1px solid var(--color-rule); }
-.building h2 { display: flex; align-items: baseline; gap: var(--space-sm); margin: 0 0 var(--space-md); font: 600 var(--text-lg)/1.2 var(--font-display); color: var(--color-ink); letter-spacing: -0.01em; }
-.building h2 small { font: 500 var(--text-xs)/1 var(--font-mono); letter-spacing: 0.06em; color: var(--color-neutral); text-transform: uppercase; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 168px), 1fr)); gap: var(--space-xs); }
+/* Chú thích */
+.legend { display: flex; flex-wrap: wrap; gap: var(--space-2xs) var(--space-lg); margin: var(--space-lg) 0 0; padding: 0; list-style: none; font-size: var(--text-sm); color: var(--color-neutral); }
+.legend li { display: flex; align-items: center; gap: var(--space-xs); white-space: nowrap; }
+.legend i { display: inline-block; width: 18px; height: 10px; border-radius: 2px; background: var(--color-block); }
+.legend i.now { background: var(--color-block-now); }
+.legend i.line { width: 2px; height: 14px; border-radius: 0; background: var(--color-accent); }
 
-.room {
-  display: block; width: 100%; text-align: left; font: inherit; cursor: pointer;
-  border: 1px solid var(--color-rule); border-radius: var(--radius-md); padding: var(--space-sm); min-width: 0;
-  background: var(--color-busy-bg); transition: border-color var(--dur-fast) var(--ease-out);
+/* Một tòa = một khối dòng thời gian */
+.bld { margin-top: var(--space-xl); }
+.bld-head, .row { display: grid; grid-template-columns: var(--col-code) var(--col-st) minmax(0, 1fr); column-gap: var(--space-sm); align-items: center; }
+.bld-head { position: sticky; top: 0; z-index: 1; padding: var(--space-xs) 0; background: var(--color-paper); border-bottom: 1px solid var(--color-ink); }
+.bld-head h2 { grid-column: 1 / 3; margin: 0; font: 700 var(--text-lg)/1.2 var(--font-body); color: var(--color-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bld-head h2 small { margin-left: var(--space-xs); font-size: var(--text-sm); font-weight: 400; color: var(--color-neutral); }
+
+.axis { position: relative; height: 1.2em; font: 400 var(--text-xs)/1.2 var(--font-mono); color: var(--color-neutral); }
+.axis span { position: absolute; transform: translateX(-50%); }
+.axis span:first-child { transform: none; }
+
+.rows { margin: 0; padding: 0; list-style: none; }
+.row {
+  width: 100%; min-height: 40px; padding: var(--space-2xs) 0; border: 0; border-bottom: 1px solid var(--color-rule);
+  background: none; font: inherit; color: inherit; text-align: left; cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out);
 }
-.room.free { background: var(--color-paper); border-color: var(--color-rule-2); }
-.room:hover { border-color: var(--color-neutral); }
-.room:active { transform: translateY(1px); }
-.room:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
-.room > span { display: block; }
-.room .name { margin: 0; font: 500 var(--text-lg)/1.2 var(--font-mono); color: var(--color-ink); }
-.room .st { margin-top: var(--space-2xs); font: 500 var(--text-xs)/1.3 var(--font-mono); letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-neutral); }
-.room.free .st { color: var(--color-accent); }
-.room .st::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; background: currentColor; }
-.room.busy .st::before { background: transparent; box-shadow: inset 0 0 0 1.5px currentColor; }
-.room .cls { margin-top: var(--space-2xs); font-size: var(--text-sm); color: var(--color-ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row:hover { background: var(--color-paper-2); }
+.row .code { font: 600 var(--text-md)/1.2 var(--font-mono); color: var(--color-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row .st { font-size: var(--text-sm); color: var(--color-ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row.busy .code { color: var(--color-neutral); font-weight: 500; }
+.row.busy .st { color: var(--color-neutral); }
+
+/* Dòng thời gian 6:00–22:00; phần đã qua trong ngày tô đậm hơn */
+.bar {
+  position: relative; height: 18px;
+  background: linear-gradient(to right, var(--color-track-past) var(--now), var(--color-track) var(--now));
+}
+.bar i { position: absolute; top: 3px; bottom: 3px; border-radius: 2px; background: var(--color-block); }
+.bar i.past { opacity: 0.45; }
+.bar i.now { background: var(--color-block-now); }
+.bar::after { content: ""; position: absolute; top: -4px; bottom: -4px; left: var(--now); width: 2px; margin-left: -1px; background: var(--color-accent); }
+.rows[data-out] .bar::after { display: none; }   /* giờ đang xem ngoài 6:00–22:00 */
+
+/* Điện thoại: trạng thái xuống dưới mã phòng */
+@media (max-width: 640px) {
+  :root { --col-code: 6.5rem; }
+  .bld-head, .row { grid-template-columns: var(--col-code) minmax(0, 1fr); }
+  .bld-head h2 { grid-column: 1 / -1; }
+  .bld-head .axis { grid-column: 2; }
+  .row .code { grid-row: 1; }
+  .row .st { grid-row: 2; grid-column: 1; font-size: var(--text-xs); }
+  .row .bar { grid-row: 1 / 3; grid-column: 2; }
+  .axis span:nth-child(even) { display: none; }   /* chỉ 6h 10h 14h 18h */
+}
+
+/* Thông báo (hết kỳ / tuần thi) */
+.notice { margin: var(--space-xl) 0 0; padding: var(--space-md) var(--space-lg); border-left: 3px solid var(--color-accent); background: var(--color-accent-soft); max-width: 68ch; }
+.notice p { margin: 0; color: var(--color-ink-2); }
+.notice p + p { margin-top: var(--space-xs); color: var(--color-neutral); }
+.notice strong { color: var(--color-ink); font-weight: 600; }
+
+.empty { padding: var(--space-2xl) 0; color: var(--color-neutral); }
 
 /* Lịch cả ngày của 1 phòng */
 dialog {
@@ -168,43 +211,29 @@ dialog {
   background: var(--color-paper); color: var(--color-ink-2);
 }
 dialog::backdrop { background: var(--color-scrim); }
-.dlg-head { display: flex; justify-content: space-between; align-items: center; gap: var(--space-md); padding: var(--space-md); border-bottom: 1px solid var(--color-rule); }
-.dlg-head h2 { margin: 0; font: 500 var(--text-lg)/1.2 var(--font-mono); color: var(--color-ink); overflow-wrap: anywhere; min-width: 0; }
-.dlg-head .meta { margin-top: var(--space-2xs); }
-.dlg-head .btn { align-self: center; }
+.dlg-head { display: flex; justify-content: space-between; align-items: center; gap: var(--space-md); padding: var(--space-md); border-bottom: 1px solid var(--color-ink); }
+.dlg-head h2 { margin: 0; font: 600 var(--text-lg)/1.2 var(--font-mono); color: var(--color-ink); overflow-wrap: anywhere; min-width: 0; }
+.dlg-head p { margin: var(--space-2xs) 0 0; font-size: var(--text-sm); color: var(--color-neutral); }
 .day { list-style: none; margin: 0; padding: 0; }
 .day li { display: grid; grid-template-columns: 7.5em minmax(0, 1fr); gap: var(--space-sm); padding: var(--space-sm) var(--space-md); border-bottom: 1px solid var(--color-rule); }
 .day li:last-child { border-bottom: 0; }
-.day time { font: 500 var(--text-sm)/1.4 var(--font-mono); color: var(--color-ink); }
-.day .c { font-size: var(--text-sm); }
-.day .c small { display: block; font: 500 var(--text-xs)/1.4 var(--font-mono); letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-neutral); }
-.day li.now { background: var(--color-accent-soft); }
-.day li.now small { color: var(--color-accent); }
-.day li.past { opacity: 0.55; }
+.day time { font: 500 var(--text-sm)/1.5 var(--font-mono); color: var(--color-ink); }
+.day .c { font-size: var(--text-sm); color: var(--color-ink); }
+.day .c small { display: block; font-size: var(--text-xs); color: var(--color-neutral); }
+.day li.now { box-shadow: inset 3px 0 0 var(--color-accent); background: var(--color-accent-soft); }
+.day li.past { opacity: 0.5; }
 .day .none { display: block; color: var(--color-neutral); }
 .report { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-sm); padding: var(--space-md); border-top: 1px solid var(--color-rule); font-size: var(--text-sm); color: var(--color-neutral); }
-a.btn { display: inline-flex; align-items: center; text-decoration: none; }
 
-.notice { margin: var(--space-lg) 0; padding: var(--space-md) var(--space-lg); border: 1px solid var(--color-rule-2); border-radius: var(--radius-md); max-width: 64ch; }
-.notice p { margin: 0; color: var(--color-ink-2); }
-.notice p + p { margin-top: var(--space-xs); color: var(--color-neutral); }
-.notice.exam { margin: var(--space-lg) 0 0; }
-.notice strong { color: var(--color-ink); font-weight: 600; }
-
-.empty { padding: var(--space-2xl) 0; color: var(--color-neutral); }
-
-footer { padding: var(--space-lg) 0 var(--space-xl); font-size: var(--text-sm); color: var(--color-neutral); }
+footer { padding: var(--space-xl) 0; font-size: var(--text-sm); color: var(--color-neutral); }
 
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
 <body>
 <header class="nav"><div class="wrap">
-  <div class="mark">Phòng trống<span>.</span></div>
-  <div class="nav-right">
-    <div class="meta" id="clock"></div>
-    <button type="button" class="btn" id="theme"></button>
-  </div>
+  <div class="mark">Phòng trống BK</div>
+  <button type="button" class="btn" id="theme"></button>
 </div></header>
 
 <main class="wrap">
@@ -220,10 +249,16 @@ footer { padding: var(--space-lg) 0 var(--space-xl); font-size: var(--text-sm); 
     <div class="field"><label for="q">Tìm phòng</label><input type="search" id="q" placeholder="VD: D9-5" autocomplete="off"></div>
     <div class="seg" role="radiogroup" aria-label="Lọc trạng thái">
       <label><input type="radio" name="st" value="free" checked><span>Trống</span></label>
-      <label><input type="radio" name="st" value="busy"><span>Đang học</span></label>
+      <label><input type="radio" name="st" value="busy"><span>Có lớp</span></label>
       <label><input type="radio" name="st" value="all"><span>Tất cả</span></label>
     </div>
   </form>
+
+  <ul class="legend" aria-hidden="true">
+    <li><i></i>Có lớp</li>
+    <li><i class="now"></i>Lớp đang học</li>
+    <li><i class="line"></i>Giờ đang xem</li>
+  </ul>
 
   <div id="list"></div>
 </main>
@@ -232,7 +267,7 @@ footer { padding: var(--space-lg) 0 var(--space-xl); font-size: var(--text-sm); 
 
 <dialog id="dlg" aria-labelledby="dlg-title">
   <div class="dlg-head">
-    <div><h2 id="dlg-title"></h2><div class="meta" id="dlg-meta"></div></div>
+    <div><h2 id="dlg-title"></h2><p id="dlg-meta"></p></div>
     <button type="button" class="btn" id="dlg-close">Đóng</button>
   </div>
   <ul class="day" id="dlg-list"></ul>
@@ -251,13 +286,18 @@ const SOURCE = `TKB ${window.TKB.term} · cập nhật ${window.TKB.updated}`;
 const ISSUES = 'https://github.com/ledangquangdangquang/wswg/issues/new';  // nút "Báo sai" mở issue điền sẵn
 const GOATCOUNTER = 'wswg345';  // tên site GoatCounter (xxx trong xxx.goatcounter.com); để trống = không đếm
 const DAY = 864e5;
+const T0 = 6 * 60, T1 = 22 * 60;                  // khung dòng thời gian 6:00–22:00
+const pct = m => ((Math.min(Math.max(m, T0), T1) - T0) / (T1 - T0) * 100).toFixed(2) + '%';
 
 const { rooms, sessions } = window.TKB;
 const building = r => r.slice(0, r.lastIndexOf('-'));
 const hm = m => String(m / 60 | 0).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
 const byRoom = rooms.map(() => []);
 for (const s of sessions) byRoom[s[0]].push(s);
-const order = rooms.map((_, i) => i).sort((a, b) => rooms[a].localeCompare(rooms[b], 'vi', { numeric: true }));
+// Tòa bắt đầu bằng chữ (D9, C7…) lên trước, cơ sở ngoài (15B-TQBuu…) xuống cuối
+const offsite = r => /^\d/.test(r) ? 1 : 0;
+const order = rooms.map((_, i) => i).sort((a, b) =>
+  offsite(rooms[a]) - offsite(rooms[b]) || rooms[a].localeCompare(rooms[b], 'vi', { numeric: true }));
 
 const $ = id => document.getElementById(id);
 const bldSel = $('bld');
@@ -278,16 +318,33 @@ function weekOf(d) {
 // s[4] là bitmask tuần; kỳ hè có tuần 45–49 nên không dùng được `&` (chỉ 32 bit)
 const inWeek = (s, week) => week >= 1 && Math.floor(s[4] / 2 ** week) % 2 === 1;
 
-// Trạng thái 1 phòng tại (thứ, tuần, phút): {busy, cls, until}
-function status(i, thu, week, t) {
+// Các buổi của 1 phòng trong ngày đang xem, theo giờ bắt đầu
+const daySessions = (i, thu, week) =>
+  byRoom[i].filter(s => s[1] === thu && inWeek(s, week)).sort((a, b) => a[2] - b[2] || a[3] - b[3]);
+
+// Trạng thái tại phút t: {busy, cls, until}
+function statusOf(day, t) {
   let cur = null, next = Infinity;
-  for (const s of byRoom[i]) {
-    if (s[1] !== thu || !inWeek(s, week)) continue;
+  for (const s of day) {
     if (s[2] <= t && t < s[3]) cur = cur && cur[3] > s[3] ? cur : s;
     else if (s[2] > t && s[2] < next) next = s[2];
   }
   return cur ? { busy: true, cls: cur, until: cur[3] } : { busy: false, until: next };
 }
+
+function rowHtml(i, day, st, t) {
+  const blocks = day.map(s =>
+    `<i class="${s[2] <= t && t < s[3] ? 'now' : s[3] <= t ? 'past' : ''}" style="left:${pct(s[2])};width:calc(${pct(s[3])} - ${pct(s[2])})"></i>`).join('');
+  const text = st.busy ? `có lớp đến ${hm(st.until)}` : st.until === Infinity ? 'trống hết ngày' : `trống đến ${hm(st.until)}`;
+  return `<li><button type="button" class="row ${st.busy ? 'busy' : 'free'}" data-i="${i}"
+      aria-label="${esc(rooms[i])}, ${text}">
+    <span class="code" title="${esc(rooms[i])}">${esc(rooms[i])}</span>
+    <span class="st">${text}</span>
+    <span class="bar" aria-hidden="true">${blocks}</span></button></li>`;
+}
+
+const AXIS = `<div class="axis" aria-hidden="true">${[6, 8, 10, 12, 14, 16, 18, 20].map(h =>
+  `<span style="left:${pct(h * 60)}">${h}h</span>`).join('')}</div>`;
 
 function render() {
   const d = live ? new Date() : new Date($('at').value || Date.now());
@@ -296,14 +353,13 @@ function render() {
   const js = d.getDay(), thu = js === 0 ? 8 : js + 1, week = weekOf(d), t = d.getHours() * 60 + d.getMinutes();
   const dayName = thu === 8 ? 'Chủ nhật' : 'Thứ ' + thu;
   ctx = { thu, week, t, dayName, date: d.toLocaleDateString('vi-VN') };
-  $('clock').textContent = `${dayName} · ${d.toLocaleDateString('vi-VN')} · ${hm(t)}`;
 
   // Ngoài khoảng tuần của TKB: không có dữ liệu, đừng báo "trống hết"
   const [w0, w1] = window.TKB.weeks;
   if (week < w0 || week > w1) {
     const before = week < w0;
     $('headline').textContent = before ? 'Chưa vào kỳ' : 'TKB đã hết hạn';
-    $('sub').textContent = `${dayName}, ${hm(t)} · ${week >= 1 ? 'tuần ' + week : 'trước tuần 1'}`;
+    $('sub').textContent = `${dayName} ${ctx.date}, ${hm(t)} · ${week >= 1 ? 'tuần ' + week : 'trước tuần 1'}`;
     $('list').innerHTML = `<div class="notice">
       <p>TKB kỳ ${esc(window.TKB.term)} chỉ có lịch từ tuần ${w0} đến tuần ${w1} (${dm(weekStart(w0))} – ${dm(new Date(+weekStart(w1) + 6 * DAY))}).
       ${before ? 'Kỳ này chưa bắt đầu' : 'Kỳ này đã kết thúc'}, nên app không biết phòng nào đang trống.</p>
@@ -320,49 +376,45 @@ function render() {
     const r = rooms[i];
     if (bld && building(r) !== bld) continue;
     if (q && !r.toUpperCase().includes(q)) continue;
-    const st = status(i, thu, week, t);
+    const day = daySessions(i, thu, week), st = statusOf(day, t);
     total++; if (!st.busy) free++;
     if (mode === 'free' && st.busy || mode === 'busy' && !st.busy) continue;
     const b = building(r);
     if (!groups.has(b)) groups.set(b, []);
-    groups.get(b).push([i, st]);
+    groups.get(b).push({ i, day, st });
   }
+  // Trong mỗi tòa: phòng trống lâu nhất lên đầu, rồi phòng sắp hết lớp sớm nhất
+  const rank = x => x.st.busy ? 1e5 + x.st.until : -Math.min(x.st.until, T1);
+  for (const list of groups.values()) list.sort((a, b) => rank(a) - rank(b));
 
-  $('headline').innerHTML = `<b>${free}</b> / ${total} phòng trống`;
-  $('sub').textContent = `${dayName}, ${hm(t)} · ${week >= 1 ? 'tuần ' + week : 'chưa vào kỳ'}${live ? ' · tự cập nhật mỗi phút' : ''}`;
+  $('headline').innerHTML = `<b>${free}</b> phòng trống`;
+  $('sub').textContent = `trên ${total} phòng · ${dayName} ${ctx.date}, ${hm(t)} · tuần ${week}${live ? ' · tự cập nhật mỗi phút' : ''}`;
 
-  const exam = window.TKB.exam.includes(week) ? `<div class="notice exam">
+  const exam = window.TKB.exam.includes(week) ? `<div class="notice">
       <p><strong>Tuần ${week} có thể là tuần thi.</strong> TKB tuần này chỉ có ít lớp nên nhiều phòng hiện trống, nhưng có thể đang được dùng để thi.</p>
       <p>Xem lịch thi trước khi vào phòng.</p>
     </div>` : '';
+  const out = t < T0 || t > T1 ? ' data-out' : '';
   $('list').innerHTML = exam + (groups.size ? [...groups].map(([b, list]) => `
-    <section class="building">
-      <h2>Tòa ${esc(b)} <small>${list.filter(x => !x[1].busy).length}/${list.length} trống</small></h2>
-      <div class="grid">${list.map(([i, st]) => st.busy ? `
-        <button type="button" class="room busy" data-i="${i}"><span class="name">${esc(rooms[i])}</span>
-          <span class="st">Đang học · đến ${hm(st.until)}</span>
-          <span class="cls" title="${esc(st.cls[5] + ' ' + st.cls[6])}">${esc(st.cls[5])} · ${esc(st.cls[6])}</span></button>` : `
-        <button type="button" class="room free" data-i="${i}"><span class="name">${esc(rooms[i])}</span>
-          <span class="st">Trống · ${st.until === Infinity ? 'hết ngày' : 'đến ' + hm(st.until)}</span></button>`).join('')}
-      </div>
+    <section class="bld">
+      <div class="bld-head"><h2>Tòa ${esc(b)}<small>${list.filter(x => !x.st.busy).length} trống / ${list.length}</small></h2>${AXIS}</div>
+      <ul class="rows" style="--now:${pct(t)}"${out}>${list.map(x => rowHtml(x.i, x.day, x.st, t)).join('')}</ul>
     </section>`).join('') : '<p class="empty">Không có phòng nào khớp bộ lọc.</p>');
 }
 
 // Lịch cả ngày (cùng thứ + tuần đang xem) của 1 phòng
 function openDay(i) {
   const { thu, week, t, dayName, date } = ctx;
-  const day = byRoom[i]
-    .filter(s => s[1] === thu && inWeek(s, week))
-    .sort((a, b) => a[2] - b[2] || a[3] - b[3]);
+  const day = daySessions(i, thu, week);
   $('dlg-title').textContent = rooms[i];
-  $('dlg-meta').textContent = `${dayName} · ${date} · ${week >= 1 ? 'tuần ' + week : 'chưa vào kỳ'}`;
+  $('dlg-meta').textContent = `${dayName} ${date} · tuần ${week}`;
   $('dlg-list').innerHTML = day.length ? day.map(s => `
     <li class="${s[2] <= t && t < s[3] ? 'now' : s[3] <= t ? 'past' : ''}">
       <time>${hm(s[2])}–${hm(s[3])}</time>
       <div class="c">${esc(s[6])}<small>${esc(s[5])} · ${esc(s[7])} · lớp ${esc(s[8])}${s[2] <= t && t < s[3] ? ' · đang học' : ''}</small></div>
     </li>`).join('') : '<li><span class="none">Không có lớp nào trong ngày này.</span></li>';
   // Báo sai: app chỉ có thể sai theo 1 chiều tại giờ đang xem
-  const st = status(i, thu, week, t), when = `${dayName} ${date} ${hm(t)} (tuần ${week})`;
+  const st = statusOf(day, t), when = `${dayName} ${date} ${hm(t)} (tuần ${week})`;
   const claim = st.busy ? `Đang học ${st.cls[5]} (lớp ${st.cls[8]}) đến ${hm(st.until)}` : 'Trống';
   $('report-q').textContent = st.busy ? 'Thực tế phòng không có lớp?' : 'Thực tế phòng đang có người?';
   $('report').href = ISSUES + '?' + new URLSearchParams({
@@ -371,7 +423,7 @@ function openDay(i) {
   });
   $('dlg').showModal();
 }
-$('list').addEventListener('click', e => { const b = e.target.closest('.room'); if (b) openDay(+b.dataset.i); });
+$('list').addEventListener('click', e => { const b = e.target.closest('.row'); if (b) openDay(+b.dataset.i); });
 $('dlg-close').addEventListener('click', () => $('dlg').close());
 $('dlg').addEventListener('click', e => { if (e.target === $('dlg')) $('dlg').close(); });  // bấm ra ngoài để đóng
 

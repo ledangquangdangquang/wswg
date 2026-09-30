@@ -37,8 +37,8 @@ Không còn cấu hình nào trong `index.html`. `data.js` chứa `term` và `up
 
 ## UI
 
-Thiết kế theo skill Hallmark: genre modern-minimal, theme Cobalt, macrostructure Catalogue. Stamp nằm đầu `<style>`.
+Thiết kế theo skill Hallmark. Genre là editorial (thiên về công cụ), macrostructure Map / Diagram, theme tự chọn với giấy ấm và vạch "bây giờ" màu đỏ son. Stamp nằm đầu `<style>`. Mỗi tòa là một khối dòng thời gian: mỗi phòng là một dòng `.row` gồm mã phòng, trạng thái và `.bar` từ 6:00 đến 22:00 (`T0`/`T1`, hàm `pct()`). Khối `.bar i` là các buổi học. `--now` (đặt trên `.rows`) quyết định vị trí vạch đỏ và phần đã qua. Trong mỗi tòa, phòng trống lâu nhất lên đầu (`rank`). Tòa có tên bắt đầu bằng số (cơ sở ngoài) xếp cuối.
 - Màu và font chỉ dùng token trong `:root`, không hard-code giá trị. Dark mode khai báo lại các token màu ở hai chỗ, `@media (prefers-color-scheme: dark)` và `:root[data-theme="dark"]`, nên khi thêm token màu mới phải thêm vào cả 3 khối. Theme người dùng chọn được lưu trong `localStorage.theme`.
-- Font: Space Grotesk (tiêu đề), Inter (nội dung), JetBrains Mono (mã phòng, nhãn).
-- Accent cobalt chỉ dùng cho trạng thái "Trống" và focus ring. Trạng thái luôn có chữ đi kèm, không để màu tự báo nghĩa.
+- Font: Be Vietnam Pro (toàn bộ chữ), JetBrains Mono (mã phòng, giờ). Không dùng nhãn mono in hoa giãn chữ.
+- Accent đỏ son chỉ dùng cho vạch giờ đang xem, số phòng trống, viền thông báo và focus ring. Trạng thái luôn có chữ đi kèm, không để màu tự báo nghĩa.
 - Bố cục phải chạy được ở độ rộng 320px, không có scroll ngang.

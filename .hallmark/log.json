@@ -1,0 +1,4 @@
+[
+  { "date": "2026-09-30", "macrostructure": "Map / Diagram", "theme": "custom", "theme_axes": "light / grotesk-sans / warm", "vibe": "bảng giờ tàu, giấy ấm, vạch đỏ bây giờ", "enrichment": "none", "nav": "N9", "footer": "Ft2", "brief": "Phòng trống BK · redesign: dòng thời gian cả ngày cho từng phòng" },
+  { "date": "2026-09-30", "macrostructure": "Catalogue", "theme": "Cobalt", "enrichment": "none", "nav": "N9", "footer": "Ft2", "brief": "Phòng trống BK · lưới thẻ phòng (bị chê AI slop)" }
+]
