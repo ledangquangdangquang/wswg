@@ -100,14 +100,44 @@ input:focus-visible, select:focus-visible, .btn:focus-visible, .seg input:focus-
 .building h2 small { font: 500 var(--text-xs)/1 var(--font-mono); letter-spacing: 0.06em; color: var(--color-neutral); text-transform: uppercase; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 168px), 1fr)); gap: var(--space-xs); }
 
-.room { border: 1px solid var(--color-rule); border-radius: var(--radius-md); padding: var(--space-sm); min-width: 0; background: var(--color-paper-2); }
+.room {
+  display: block; width: 100%; text-align: left; font: inherit; cursor: pointer;
+  border: 1px solid var(--color-rule); border-radius: var(--radius-md); padding: var(--space-sm); min-width: 0;
+  background: var(--color-paper-2); transition: border-color var(--dur-fast) var(--ease-out);
+}
 .room.free { background: var(--color-paper); border-color: var(--color-rule-2); }
-.room h3 { margin: 0; font: 500 var(--text-lg)/1.2 var(--font-mono); color: var(--color-ink); }
+.room:hover { border-color: var(--color-neutral); }
+.room:active { transform: translateY(1px); }
+.room:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.room > span { display: block; }
+.room .name { margin: 0; font: 500 var(--text-lg)/1.2 var(--font-mono); color: var(--color-ink); }
 .room .st { margin-top: var(--space-2xs); font: 500 var(--text-xs)/1.3 var(--font-mono); letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-neutral); }
 .room.free .st { color: var(--color-accent); }
 .room .st::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; background: currentColor; }
 .room.busy .st::before { background: transparent; box-shadow: inset 0 0 0 1.5px currentColor; }
 .room .cls { margin-top: var(--space-2xs); font-size: var(--text-sm); color: var(--color-ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Lịch cả ngày của 1 phòng */
+dialog {
+  width: min(480px, calc(100% - 2 * var(--space-md))); max-height: calc(100dvh - 2 * var(--space-xl));
+  padding: 0; border: 1px solid var(--color-rule-2); border-radius: var(--radius-md);
+  background: var(--color-paper); color: var(--color-ink-2);
+}
+dialog::backdrop { background: oklch(24% 0.02 258 / 0.35); }
+.dlg-head { display: flex; justify-content: space-between; align-items: center; gap: var(--space-md); padding: var(--space-md); border-bottom: 1px solid var(--color-rule); }
+.dlg-head h2 { margin: 0; font: 500 var(--text-lg)/1.2 var(--font-mono); color: var(--color-ink); overflow-wrap: anywhere; min-width: 0; }
+.dlg-head .meta { margin-top: var(--space-2xs); }
+.dlg-head .btn { align-self: center; }
+.day { list-style: none; margin: 0; padding: 0; }
+.day li { display: grid; grid-template-columns: 7.5em minmax(0, 1fr); gap: var(--space-sm); padding: var(--space-sm) var(--space-md); border-bottom: 1px solid var(--color-rule); }
+.day li:last-child { border-bottom: 0; }
+.day time { font: 500 var(--text-sm)/1.4 var(--font-mono); color: var(--color-ink); }
+.day .c { font-size: var(--text-sm); }
+.day .c small { display: block; font: 500 var(--text-xs)/1.4 var(--font-mono); letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-neutral); }
+.day li.now { background: var(--color-accent-soft); }
+.day li.now small { color: var(--color-accent); }
+.day li.past { opacity: 0.55; }
+.day .none { display: block; color: var(--color-neutral); }
 
 .empty { padding: var(--space-2xl) 0; color: var(--color-neutral); }
 
@@ -145,6 +175,14 @@ footer { padding: var(--space-lg) 0 var(--space-xl); font-size: var(--text-sm); 
 
 <footer class="wrap" id="foot"></footer>
 
+<dialog id="dlg" aria-labelledby="dlg-title">
+  <div class="dlg-head">
+    <div><h2 id="dlg-title"></h2><div class="meta" id="dlg-meta"></div></div>
+    <button type="button" class="btn" id="dlg-close">Đóng</button>
+  </div>
+  <ul class="day" id="dlg-list"></ul>
+</dialog>
+
 <script src="data.js"></script>
 <script>
 const WEEK1 = new Date(2026, 8, 7);            // Thứ Hai tuần 1, kỳ 20261
@@ -162,7 +200,8 @@ const $ = id => document.getElementById(id);
 const bldSel = $('bld');
 [...new Set(order.map(i => building(rooms[i])))].forEach(b => bldSel.add(new Option('Tòa ' + b, b)));
 
-let live = true;
+let live = true, ctx;
+const esc = s => s.replace(/[&<>"]/g, c => `&#${c.charCodeAt(0)};`);
 const toLocalInput = d => new Date(d - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 16);
 
 function weekOf(d) {
@@ -187,6 +226,7 @@ function render() {
   $('now').disabled = live;
   const js = d.getDay(), thu = js === 0 ? 8 : js + 1, week = weekOf(d), t = d.getHours() * 60 + d.getMinutes();
   const dayName = thu === 8 ? 'Chủ nhật' : 'Thứ ' + thu;
+  ctx = { thu, week, t, dayName, date: d.toLocaleDateString('vi-VN') };
   const bld = bldSel.value, q = $('q').value.trim().toUpperCase(), mode = document.querySelector('[name=st]:checked').value;
 
   const groups = new Map();
@@ -200,26 +240,44 @@ function render() {
     if (mode === 'free' && st.busy || mode === 'busy' && !st.busy) continue;
     const b = building(r);
     if (!groups.has(b)) groups.set(b, []);
-    groups.get(b).push([r, st]);
+    groups.get(b).push([i, st]);
   }
 
   $('clock').textContent = `${dayName} · ${d.toLocaleDateString('vi-VN')} · ${hm(t)}`;
   $('headline').innerHTML = `<b>${free}</b> / ${total} phòng trống`;
   $('sub').textContent = `${dayName}, ${hm(t)} · ${week >= 1 ? 'tuần ' + week : 'chưa vào kỳ'}${live ? ' · tự cập nhật mỗi phút' : ''}`;
 
-  const esc = s => s.replace(/[&<>"]/g, c => `&#${c.charCodeAt(0)};`);
   $('list').innerHTML = groups.size ? [...groups].map(([b, list]) => `
     <section class="building">
       <h2>Tòa ${esc(b)} <small>${list.filter(x => !x[1].busy).length}/${list.length} trống</small></h2>
-      <div class="grid">${list.map(([r, st]) => st.busy ? `
-        <article class="room busy"><h3>${esc(r)}</h3>
-          <div class="st">Đang học · đến ${hm(st.until)}</div>
-          <div class="cls" title="${esc(st.cls[5] + ' ' + st.cls[6])}">${esc(st.cls[5])} · ${esc(st.cls[6])}</div></article>` : `
-        <article class="room free"><h3>${esc(r)}</h3>
-          <div class="st">Trống · ${st.until === Infinity ? 'hết ngày' : 'đến ' + hm(st.until)}</div></article>`).join('')}
+      <div class="grid">${list.map(([i, st]) => st.busy ? `
+        <button type="button" class="room busy" data-i="${i}"><span class="name">${esc(rooms[i])}</span>
+          <span class="st">Đang học · đến ${hm(st.until)}</span>
+          <span class="cls" title="${esc(st.cls[5] + ' ' + st.cls[6])}">${esc(st.cls[5])} · ${esc(st.cls[6])}</span></button>` : `
+        <button type="button" class="room free" data-i="${i}"><span class="name">${esc(rooms[i])}</span>
+          <span class="st">Trống · ${st.until === Infinity ? 'hết ngày' : 'đến ' + hm(st.until)}</span></button>`).join('')}
       </div>
     </section>`).join('') : '<p class="empty">Không có phòng nào khớp bộ lọc.</p>';
 }
+
+// Lịch cả ngày (cùng thứ + tuần đang xem) của 1 phòng
+function openDay(i) {
+  const { thu, week, t, dayName, date } = ctx;
+  const day = byRoom[i]
+    .filter(s => s[1] === thu && week >= 1 && week <= 30 && s[4] & (1 << week))
+    .sort((a, b) => a[2] - b[2] || a[3] - b[3]);
+  $('dlg-title').textContent = rooms[i];
+  $('dlg-meta').textContent = `${dayName} · ${date} · ${week >= 1 ? 'tuần ' + week : 'chưa vào kỳ'}`;
+  $('dlg-list').innerHTML = day.length ? day.map(s => `
+    <li class="${s[2] <= t && t < s[3] ? 'now' : s[3] <= t ? 'past' : ''}">
+      <time>${hm(s[2])}–${hm(s[3])}</time>
+      <div class="c">${esc(s[6])}<small>${esc(s[5])} · ${esc(s[7])} · lớp ${esc(s[8])}${s[2] <= t && t < s[3] ? ' · đang học' : ''}</small></div>
+    </li>`).join('') : '<li><span class="none">Không có lớp nào trong ngày này.</span></li>';
+  $('dlg').showModal();
+}
+$('list').addEventListener('click', e => { const b = e.target.closest('.room'); if (b) openDay(+b.dataset.i); });
+$('dlg-close').addEventListener('click', () => $('dlg').close());
+$('dlg').addEventListener('click', e => { if (e.target === $('dlg')) $('dlg').close(); });  // bấm ra ngoài để đóng
 
 $('foot').textContent = `${SOURCE} · ${rooms.length} phòng học · tuần 1 bắt đầu ${WEEK1.toLocaleDateString('vi-VN')}`;
 $('at').addEventListener('input', () => { live = false; render(); });
