@@ -99,7 +99,11 @@ def build(rows):
         idx = rooms.setdefault(room, len(rooms))
         sessions.append([idx, int(thu), minutes(start), minutes(end), sum(1 << w for w in set(weeks(wk))), r[4], name(r), r[21], r[2]])
     names = sorted(rooms, key=rooms.get)
-    return {"rooms": names, "sessions": sessions}
+    mask = 0
+    for s in sessions:
+        mask |= s[4]
+    weeks_range = [(mask & -mask).bit_length() - 1, mask.bit_length() - 1]  # tuần đầu / cuối có lớp
+    return {"weeks": weeks_range, "rooms": names, "sessions": sessions}
 
 
 if __name__ == "__main__":
@@ -128,5 +132,5 @@ if __name__ == "__main__":
     data = {"term": term, "updated": updated, "week1": week1, **build(table)}
     with open("data.js", "w", encoding="utf-8") as f:
         f.write("window.TKB=" + json.dumps(data, ensure_ascii=False, separators=(",", ":")) + ";\n")
-    print(f"{path}: kỳ {term}, cập nhật {updated}, tuần 1 = {week1}")
+    print(f"{path}: kỳ {term}, cập nhật {updated}, tuần 1 = {week1}, có lớp tuần {data['weeks'][0]}–{data['weeks'][1]}")
     print(f"{len(data['rooms'])} phòng, {len(data['sessions'])} buổi -> data.js")

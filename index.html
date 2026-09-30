@@ -185,6 +185,10 @@ dialog::backdrop { background: var(--color-scrim); }
 .report { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-sm); padding: var(--space-md); border-top: 1px solid var(--color-rule); font-size: var(--text-sm); color: var(--color-neutral); }
 a.btn { display: inline-flex; align-items: center; text-decoration: none; }
 
+.notice { margin: var(--space-lg) 0; padding: var(--space-md) var(--space-lg); border: 1px solid var(--color-rule-2); border-radius: var(--radius-md); max-width: 64ch; }
+.notice p { margin: 0; color: var(--color-ink-2); }
+.notice p + p { margin-top: var(--space-xs); color: var(--color-neutral); }
+
 .empty { padding: var(--space-2xl) 0; color: var(--color-neutral); }
 
 footer { padding: var(--space-lg) 0 var(--space-xl); font-size: var(--text-sm); color: var(--color-neutral); }
@@ -260,6 +264,9 @@ let live = true, ctx;
 const esc = s => s.replace(/[&<>"]/g, c => `&#${c.charCodeAt(0)};`);
 const toLocalInput = d => new Date(d - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 16);
 
+const weekStart = n => new Date(+WEEK1 + (n - 1) * 7 * DAY);
+const dm = d => d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
 function weekOf(d) {
   const day = new Date(d.getFullYear(), d.getMonth(), d.getDate());
   return Math.floor(Math.round((day - WEEK1) / DAY) / 7) + 1;
@@ -286,6 +293,22 @@ function render() {
   const js = d.getDay(), thu = js === 0 ? 8 : js + 1, week = weekOf(d), t = d.getHours() * 60 + d.getMinutes();
   const dayName = thu === 8 ? 'Chủ nhật' : 'Thứ ' + thu;
   ctx = { thu, week, t, dayName, date: d.toLocaleDateString('vi-VN') };
+  $('clock').textContent = `${dayName} · ${d.toLocaleDateString('vi-VN')} · ${hm(t)}`;
+
+  // Ngoài khoảng tuần của TKB: không có dữ liệu, đừng báo "trống hết"
+  const [w0, w1] = window.TKB.weeks;
+  if (week < w0 || week > w1) {
+    const before = week < w0;
+    $('headline').textContent = before ? 'Chưa vào kỳ' : 'TKB đã hết hạn';
+    $('sub').textContent = `${dayName}, ${hm(t)} · ${week >= 1 ? 'tuần ' + week : 'trước tuần 1'}`;
+    $('list').innerHTML = `<div class="notice">
+      <p>TKB kỳ ${esc(window.TKB.term)} chỉ có lịch từ tuần ${w0} đến tuần ${w1} (${dm(weekStart(w0))} – ${dm(new Date(+weekStart(w1) + 6 * DAY))}).
+      ${before ? 'Kỳ này chưa bắt đầu' : 'Kỳ này đã kết thúc'}, nên app không biết phòng nào đang trống.</p>
+      <p>${before ? 'Chọn một giờ trong kỳ ở ô “Xem lúc” để xem trước.' : 'Chờ TKB kỳ mới, hoặc chọn một giờ trong kỳ ở ô “Xem lúc” để xem lại.'}</p>
+    </div>`;
+    return;
+  }
+
   const bld = bldSel.value, q = $('q').value.trim().toUpperCase(), mode = document.querySelector('[name=st]:checked').value;
 
   const groups = new Map();
@@ -302,7 +325,6 @@ function render() {
     groups.get(b).push([i, st]);
   }
 
-  $('clock').textContent = `${dayName} · ${d.toLocaleDateString('vi-VN')} · ${hm(t)}`;
   $('headline').innerHTML = `<b>${free}</b> / ${total} phòng trống`;
   $('sub').textContent = `${dayName}, ${hm(t)} · ${week >= 1 ? 'tuần ' + week : 'chưa vào kỳ'}${live ? ' · tự cập nhật mỗi phút' : ''}`;
 
