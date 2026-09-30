@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>try { const t = localStorage.getItem('theme'); if (t) document.documentElement.dataset.theme = t; } catch {}</script>
 <style>
 /* Hallmark · genre: modern-minimal · macrostructure: Catalogue · theme: Cobalt · enrichment: none · nav: N9 edge-aligned · footer: Ft2 inline
  * tone: utilitarian · anchor hue: 256 (cobalt) · audience: sinh viên BK tìm phòng tự học
@@ -23,6 +24,9 @@
   --color-accent-soft: oklch(95% 0.03 256);
   --color-accent-ink:  oklch(98.5% 0.004 250);
   --color-focus:    oklch(52% 0.20 256);
+  --color-busy-bg:  oklch(95.5% 0.006 252);
+  --color-scrim:    oklch(24% 0.02 258 / 0.35);
+  color-scheme: light;
 
   --font-display: "Space Grotesk", system-ui, sans-serif;
   --font-body:    "Inter", system-ui, sans-serif;
@@ -39,6 +43,42 @@
   --dur-fast: 120ms;
 }
 
+/* Dark: theo hệ thống, nút trên nav ghi đè bằng data-theme */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-paper:    oklch(17% 0.012 258);
+    --color-paper-2:  oklch(21% 0.014 258);
+    --color-busy-bg:  oklch(14.5% 0.010 258);
+    --color-rule:     oklch(28% 0.014 258);
+    --color-rule-2:   oklch(38% 0.016 258);
+    --color-neutral:  oklch(68% 0.014 257);
+    --color-ink-2:    oklch(84% 0.010 255);
+    --color-ink:      oklch(95% 0.006 250);
+    --color-accent:   oklch(72% 0.15 256);
+    --color-accent-soft: oklch(26% 0.06 256);
+    --color-accent-ink:  oklch(17% 0.012 258);
+    --color-focus:    oklch(74% 0.15 256);
+    --color-scrim:    oklch(8% 0.01 258 / 0.6);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --color-paper:    oklch(17% 0.012 258);
+  --color-paper-2:  oklch(21% 0.014 258);
+  --color-busy-bg:  oklch(14.5% 0.010 258);
+  --color-rule:     oklch(28% 0.014 258);
+  --color-rule-2:   oklch(38% 0.016 258);
+  --color-neutral:  oklch(68% 0.014 257);
+  --color-ink-2:    oklch(84% 0.010 255);
+  --color-ink:      oklch(95% 0.006 250);
+  --color-accent:   oklch(72% 0.15 256);
+  --color-accent-soft: oklch(26% 0.06 256);
+  --color-accent-ink:  oklch(17% 0.012 258);
+  --color-focus:    oklch(74% 0.15 256);
+  --color-scrim:    oklch(8% 0.01 258 / 0.6);
+  color-scheme: dark;
+}
+
 *, *::before, *::after { box-sizing: border-box; }
 html, body { overflow-x: clip; }
 body {
@@ -53,6 +93,10 @@ body {
 .nav .wrap { display: flex; justify-content: space-between; align-items: center; min-height: 56px; gap: var(--space-md); }
 .mark { font: 600 var(--text-md)/1 var(--font-display); color: var(--color-ink); letter-spacing: -0.01em; white-space: nowrap; }
 .mark span { color: var(--color-accent); }
+.nav-right { display: flex; align-items: center; gap: var(--space-sm); }
+.nav-right .btn { height: 32px; }
+#clock { display: none; }
+@media (min-width: 560px) { #clock { display: block; } }
 .meta { font: 500 var(--text-xs)/1 var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-neutral); white-space: nowrap; }
 
 /* Summary */
@@ -103,7 +147,7 @@ input:focus-visible, select:focus-visible, .btn:focus-visible, .seg input:focus-
 .room {
   display: block; width: 100%; text-align: left; font: inherit; cursor: pointer;
   border: 1px solid var(--color-rule); border-radius: var(--radius-md); padding: var(--space-sm); min-width: 0;
-  background: var(--color-paper-2); transition: border-color var(--dur-fast) var(--ease-out);
+  background: var(--color-busy-bg); transition: border-color var(--dur-fast) var(--ease-out);
 }
 .room.free { background: var(--color-paper); border-color: var(--color-rule-2); }
 .room:hover { border-color: var(--color-neutral); }
@@ -123,7 +167,7 @@ dialog {
   padding: 0; border: 1px solid var(--color-rule-2); border-radius: var(--radius-md);
   background: var(--color-paper); color: var(--color-ink-2);
 }
-dialog::backdrop { background: oklch(24% 0.02 258 / 0.35); }
+dialog::backdrop { background: var(--color-scrim); }
 .dlg-head { display: flex; justify-content: space-between; align-items: center; gap: var(--space-md); padding: var(--space-md); border-bottom: 1px solid var(--color-rule); }
 .dlg-head h2 { margin: 0; font: 500 var(--text-lg)/1.2 var(--font-mono); color: var(--color-ink); overflow-wrap: anywhere; min-width: 0; }
 .dlg-head .meta { margin-top: var(--space-2xs); }
@@ -149,7 +193,10 @@ footer { padding: var(--space-lg) 0 var(--space-xl); font-size: var(--text-sm); 
 <body>
 <header class="nav"><div class="wrap">
   <div class="mark">Phòng trống<span>.</span></div>
-  <div class="meta" id="clock"></div>
+  <div class="nav-right">
+    <div class="meta" id="clock"></div>
+    <button type="button" class="btn" id="theme"></button>
+  </div>
 </div></header>
 
 <main class="wrap">
@@ -278,6 +325,21 @@ function openDay(i) {
 $('list').addEventListener('click', e => { const b = e.target.closest('.room'); if (b) openDay(+b.dataset.i); });
 $('dlg-close').addEventListener('click', () => $('dlg').close());
 $('dlg').addEventListener('click', e => { if (e.target === $('dlg')) $('dlg').close(); });  // bấm ra ngoài để đóng
+
+// Sáng / tối
+const root = document.documentElement, sysDark = matchMedia('(prefers-color-scheme: dark)');
+const isDark = () => root.dataset.theme ? root.dataset.theme === 'dark' : sysDark.matches;
+const themeLabel = () => {
+  $('theme').textContent = isDark() ? 'Sáng' : 'Tối';
+  $('theme').setAttribute('aria-label', isDark() ? 'Chuyển sang giao diện sáng' : 'Chuyển sang giao diện tối');
+};
+$('theme').addEventListener('click', () => {
+  root.dataset.theme = isDark() ? 'light' : 'dark';
+  try { localStorage.setItem('theme', root.dataset.theme); } catch {}
+  themeLabel();
+});
+sysDark.addEventListener('change', themeLabel);
+themeLabel();
 
 $('foot').textContent = `${SOURCE} · ${rooms.length} phòng học · tuần 1 bắt đầu ${WEEK1.toLocaleDateString('vi-VN')}`;
 $('at').addEventListener('input', () => { live = false; render(); });

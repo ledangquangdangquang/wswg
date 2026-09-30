@@ -34,7 +34,7 @@ Sang kỳ mới thì sửa 2 hằng số đầu `<script>` trong `index.html`: `
 ## UI
 
 Thiết kế theo skill Hallmark: genre modern-minimal, theme Cobalt, macrostructure Catalogue. Stamp nằm đầu `<style>`.
-- Màu và font chỉ dùng token trong `:root`, không hard-code giá trị.
+- Màu và font chỉ dùng token trong `:root`, không hard-code giá trị. Dark mode khai báo lại các token màu ở hai chỗ, `@media (prefers-color-scheme: dark)` và `:root[data-theme="dark"]`, nên khi thêm token màu mới phải thêm vào cả 3 khối. Theme người dùng chọn được lưu trong `localStorage.theme`.
 - Font: Space Grotesk (tiêu đề), Inter (nội dung), JetBrains Mono (mã phòng, nhãn).
 - Accent cobalt chỉ dùng cho trạng thái "Trống" và focus ring. Trạng thái luôn có chữ đi kèm, không để màu tự báo nghĩa.
 - Bố cục phải chạy được ở độ rộng 320px, không có scroll ngang.
