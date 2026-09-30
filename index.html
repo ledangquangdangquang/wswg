@@ -1,16 +1,232 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>TKB Viewer</title>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="app.js" defer></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phòng trống BK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Hallmark · genre: modern-minimal · macrostructure: Catalogue · theme: Cobalt · enrichment: none · nav: N9 edge-aligned · footer: Ft2 inline
+ * tone: utilitarian · anchor hue: 256 (cobalt) · audience: sinh viên BK tìm phòng tự học
+ */
+:root {
+  --color-paper:    oklch(98.5% 0.004 250);
+  --color-paper-2:  oklch(95.5% 0.006 252);
+  --color-rule:     oklch(89% 0.008 255);
+  --color-rule-2:   oklch(80% 0.010 256);
+  --color-neutral:  oklch(52% 0.014 257);
+  --color-ink-2:    oklch(34% 0.018 257);
+  --color-ink:      oklch(24% 0.020 258);
+  --color-accent:   oklch(52% 0.20 256);
+  --color-accent-soft: oklch(95% 0.03 256);
+  --color-accent-ink:  oklch(98.5% 0.004 250);
+  --color-focus:    oklch(52% 0.20 256);
+
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-body:    "Inter", system-ui, sans-serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, monospace;
+
+  --text-xs: 0.75rem; --text-sm: 0.875rem; --text-md: 1rem; --text-lg: 1.25rem;
+  --text-display: clamp(2.25rem, 6vw + 0.5rem, 4.5rem);
+
+  --space-2xs: 4px; --space-xs: 8px; --space-sm: 12px; --space-md: 16px;
+  --space-lg: 24px; --space-xl: 40px; --space-2xl: 64px;
+
+  --radius-sm: 6px; --radius-md: 10px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 120ms;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { overflow-x: clip; }
+body {
+  margin: 0; background: var(--color-paper); color: var(--color-ink-2);
+  font: 400 var(--text-md)/1.5 var(--font-body);
+  font-variant-numeric: tabular-nums;
+}
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 var(--space-md); }
+
+/* Nav — edge-aligned, hairline below */
+.nav { border-bottom: 1px solid var(--color-rule); }
+.nav .wrap { display: flex; justify-content: space-between; align-items: center; min-height: 56px; gap: var(--space-md); }
+.mark { font: 600 var(--text-md)/1 var(--font-display); color: var(--color-ink); letter-spacing: -0.01em; white-space: nowrap; }
+.mark span { color: var(--color-accent); }
+.meta { font: 500 var(--text-xs)/1 var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-neutral); white-space: nowrap; }
+
+/* Summary */
+.summary { padding: var(--space-xl) 0 var(--space-lg); }
+.summary h1 {
+  margin: 0; font: 600 var(--text-display)/1 var(--font-display); color: var(--color-ink);
+  letter-spacing: -0.035em; overflow-wrap: anywhere; min-width: 0;
+}
+.summary h1 b { color: var(--color-accent); font-weight: 600; }
+.summary p { margin: var(--space-sm) 0 0; color: var(--color-neutral); }
+
+/* Controls */
+.controls { display: flex; flex-wrap: wrap; gap: var(--space-xs); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--color-rule); }
+.field { display: flex; flex-direction: column; gap: var(--space-2xs); min-width: 0; flex: 1 1 160px; }
+.field label { font: 500 var(--text-xs)/1 var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-neutral); }
+input, select, .btn {
+  font: 500 var(--text-sm)/1 var(--font-body); color: var(--color-ink);
+  height: 40px; padding: 0 var(--space-sm); border: 1px solid var(--color-rule-2);
+  border-radius: var(--radius-sm); background: var(--color-paper); min-width: 0; width: 100%;
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+input:hover, select:hover, .btn:hover { border-color: var(--color-neutral); }
+input:focus-visible, select:focus-visible, .btn:focus-visible, .seg input:focus-visible + span {
+  outline: 2px solid var(--color-focus); outline-offset: 2px;
+}
+.btn { width: auto; cursor: pointer; white-space: nowrap; align-self: flex-end; }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: 0.45; cursor: default; transform: none; border-color: var(--color-rule-2); }
+
+.seg { display: flex; border: 1px solid var(--color-rule-2); border-radius: var(--radius-sm); overflow: hidden; height: 40px; flex: 1 1 240px; align-self: flex-end; }
+.seg label { flex: 1; display: flex; position: relative; }
+.seg input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.seg span {
+  flex: 1; display: grid; place-items: center; padding: 0 var(--space-sm); cursor: pointer; white-space: nowrap;
+  font: 500 var(--text-sm)/1 var(--font-body); color: var(--color-ink-2);
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+.seg label + label span { border-left: 1px solid var(--color-rule-2); }
+.seg span:hover { background: var(--color-paper-2); }
+.seg input:checked + span { background: var(--color-ink); color: var(--color-paper); }
+
+/* Catalogue — one band per building */
+.building { padding: var(--space-lg) 0; border-bottom: 1px solid var(--color-rule); }
+.building h2 { display: flex; align-items: baseline; gap: var(--space-sm); margin: 0 0 var(--space-md); font: 600 var(--text-lg)/1.2 var(--font-display); color: var(--color-ink); letter-spacing: -0.01em; }
+.building h2 small { font: 500 var(--text-xs)/1 var(--font-mono); letter-spacing: 0.06em; color: var(--color-neutral); text-transform: uppercase; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 168px), 1fr)); gap: var(--space-xs); }
+
+.room { border: 1px solid var(--color-rule); border-radius: var(--radius-md); padding: var(--space-sm); min-width: 0; background: var(--color-paper-2); }
+.room.free { background: var(--color-paper); border-color: var(--color-rule-2); }
+.room h3 { margin: 0; font: 500 var(--text-lg)/1.2 var(--font-mono); color: var(--color-ink); }
+.room .st { margin-top: var(--space-2xs); font: 500 var(--text-xs)/1.3 var(--font-mono); letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-neutral); }
+.room.free .st { color: var(--color-accent); }
+.room .st::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; background: currentColor; }
+.room.busy .st::before { background: transparent; box-shadow: inset 0 0 0 1.5px currentColor; }
+.room .cls { margin-top: var(--space-2xs); font-size: var(--text-sm); color: var(--color-ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.empty { padding: var(--space-2xl) 0; color: var(--color-neutral); }
+
+footer { padding: var(--space-lg) 0 var(--space-xl); font-size: var(--text-sm); color: var(--color-neutral); }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
 </head>
 <body>
-  <h2 id="status">Đang tải thời khóa biểu...</h2>
-  <h3>Phòng đang học:</h3>
-  <ul id="occupied"></ul>
-  <h3>Phòng trống:</h3>
-  <ul id="available"></ul>
+<header class="nav"><div class="wrap">
+  <div class="mark">Phòng trống<span>.</span></div>
+  <div class="meta" id="clock"></div>
+</div></header>
+
+<main class="wrap">
+  <section class="summary">
+    <h1 id="headline">Đang tải…</h1>
+    <p id="sub"></p>
+  </section>
+
+  <form class="controls" id="controls" onsubmit="return false">
+    <div class="field"><label for="at">Xem lúc</label><input type="datetime-local" id="at"></div>
+    <button type="button" class="btn" id="now">Về hiện tại</button>
+    <div class="field"><label for="bld">Tòa nhà</label><select id="bld"><option value="">Tất cả tòa</option></select></div>
+    <div class="field"><label for="q">Tìm phòng</label><input type="search" id="q" placeholder="VD: D9-5" autocomplete="off"></div>
+    <div class="seg" role="radiogroup" aria-label="Lọc trạng thái">
+      <label><input type="radio" name="st" value="free" checked><span>Trống</span></label>
+      <label><input type="radio" name="st" value="busy"><span>Đang học</span></label>
+      <label><input type="radio" name="st" value="all"><span>Tất cả</span></label>
+    </div>
+  </form>
+
+  <div id="list"></div>
+</main>
+
+<footer class="wrap" id="foot"></footer>
+
+<script src="data.js"></script>
+<script>
+const WEEK1 = new Date(2026, 8, 7);            // Thứ Hai tuần 1, kỳ 20261
+const SOURCE = 'TKB 20261 · cập nhật 11.09.2026';
+const DAY = 864e5;
+
+const { rooms, sessions } = window.TKB;
+const building = r => r.slice(0, r.lastIndexOf('-'));
+const hm = m => String(m / 60 | 0).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
+const byRoom = rooms.map(() => []);
+for (const s of sessions) byRoom[s[0]].push(s);
+const order = rooms.map((_, i) => i).sort((a, b) => rooms[a].localeCompare(rooms[b], 'vi', { numeric: true }));
+
+const $ = id => document.getElementById(id);
+const bldSel = $('bld');
+[...new Set(order.map(i => building(rooms[i])))].forEach(b => bldSel.add(new Option('Tòa ' + b, b)));
+
+let live = true;
+const toLocalInput = d => new Date(d - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 16);
+
+function weekOf(d) {
+  const day = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  return Math.floor(Math.round((day - WEEK1) / DAY) / 7) + 1;
+}
+
+// Trạng thái 1 phòng tại (thứ, tuần, phút): {busy, cls, until}
+function status(i, thu, week, t) {
+  let cur = null, next = Infinity;
+  for (const s of byRoom[i]) {
+    if (s[1] !== thu || week < 1 || week > 30 || !(s[4] & (1 << week))) continue;
+    if (s[2] <= t && t < s[3]) cur = cur && cur[3] > s[3] ? cur : s;
+    else if (s[2] > t && s[2] < next) next = s[2];
+  }
+  return cur ? { busy: true, cls: cur, until: cur[3] } : { busy: false, until: next };
+}
+
+function render() {
+  const d = live ? new Date() : new Date($('at').value || Date.now());
+  if (live) $('at').value = toLocalInput(d);
+  $('now').disabled = live;
+  const js = d.getDay(), thu = js === 0 ? 8 : js + 1, week = weekOf(d), t = d.getHours() * 60 + d.getMinutes();
+  const dayName = thu === 8 ? 'Chủ nhật' : 'Thứ ' + thu;
+  const bld = bldSel.value, q = $('q').value.trim().toUpperCase(), mode = document.querySelector('[name=st]:checked').value;
+
+  const groups = new Map();
+  let free = 0, total = 0;
+  for (const i of order) {
+    const r = rooms[i];
+    if (bld && building(r) !== bld) continue;
+    if (q && !r.includes(q)) continue;
+    const st = status(i, thu, week, t);
+    total++; if (!st.busy) free++;
+    if (mode === 'free' && st.busy || mode === 'busy' && !st.busy) continue;
+    const b = building(r);
+    if (!groups.has(b)) groups.set(b, []);
+    groups.get(b).push([r, st]);
+  }
+
+  $('clock').textContent = `${dayName} · ${d.toLocaleDateString('vi-VN')} · ${hm(t)}`;
+  $('headline').innerHTML = `<b>${free}</b> / ${total} phòng trống`;
+  $('sub').textContent = `${dayName}, ${hm(t)} · ${week >= 1 ? 'tuần ' + week : 'chưa vào kỳ'}${live ? ' · tự cập nhật mỗi phút' : ''}`;
+
+  const esc = s => s.replace(/[&<>"]/g, c => `&#${c.charCodeAt(0)};`);
+  $('list').innerHTML = groups.size ? [...groups].map(([b, list]) => `
+    <section class="building">
+      <h2>Tòa ${esc(b)} <small>${list.filter(x => !x[1].busy).length}/${list.length} trống</small></h2>
+      <div class="grid">${list.map(([r, st]) => st.busy ? `
+        <article class="room busy"><h3>${esc(r)}</h3>
+          <div class="st">Đang học · đến ${hm(st.until)}</div>
+          <div class="cls" title="${esc(st.cls[5] + ' ' + st.cls[6])}">${esc(st.cls[5])} · ${esc(st.cls[6])}</div></article>` : `
+        <article class="room free"><h3>${esc(r)}</h3>
+          <div class="st">Trống · ${st.until === Infinity ? 'hết ngày' : 'đến ' + hm(st.until)}</div></article>`).join('')}
+      </div>
+    </section>`).join('') : '<p class="empty">Không có phòng nào khớp bộ lọc.</p>';
+}
+
+$('foot').textContent = `${SOURCE} · ${rooms.length} phòng học · tuần 1 bắt đầu ${WEEK1.toLocaleDateString('vi-VN')}`;
+$('at').addEventListener('input', () => { live = false; render(); });
+$('now').addEventListener('click', () => { live = true; render(); });
+$('controls').addEventListener('input', e => { if (e.target.id !== 'at') render(); });
+setInterval(() => live && render(), 60e3);
+render();
+</script>
 </body>
 </html>
