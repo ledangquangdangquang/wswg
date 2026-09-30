@@ -9,6 +9,7 @@ Xem nhanh phòng học nào ở Bách khoa đang có lớp và phòng nào đang
 - Số phòng trống ngay lúc này, tự cập nhật mỗi phút.
 - Mỗi phòng ghi rõ "Trống · đến 14:10" hoặc "Đang học · đến 11:45", kèm tên môn.
 - Bấm vào một phòng để xem lịch cả ngày của phòng đó.
+- Thấy app báo sai thì bấm **Báo sai** trong lịch phòng. Nút này mở một GitHub Issue điền sẵn phòng, giờ, app báo gì và thực tế ra sao (cần tài khoản GitHub). Danh sách báo sai xem ở [Issues](https://github.com/ledangquangdangquang/wswg/issues?q=%5BB%C3%A1o+sai%5D).
 - Chọn giờ khác trong ô "Xem lúc" để xem trước, ví dụ chiều mai phòng nào trống.
 - Lọc theo tòa nhà, tìm theo mã phòng (ví dụ `D9-5`), lọc theo Trống / Đang học.
 - Giao diện sáng hoặc tối: mặc định theo hệ thống, đổi được bằng nút trên thanh đầu trang.
