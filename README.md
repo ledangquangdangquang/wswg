@@ -25,13 +25,17 @@ Mở thẳng `index.html` bằng trình duyệt là chạy được, không cầ
    ```sh
    python3 build_data.py "TKB20261-FULL.xlsx"   # không truyền tên file thì lấy file TKB* mới nhất
    ```
-   Lệnh này tạo lại `data.js`. Chỉ cần Python 3, không phải cài thêm thư viện.
-3. Sang kỳ mới thì sửa `WEEK1` (ngày thứ Hai của tuần 1) và `SOURCE` ở đầu thẻ `<script>` trong `index.html`.
+   Lệnh này tạo lại `data.js`. Chỉ cần Python 3, không phải cài thêm thư viện. Kỳ và ngày cập nhật được đọc tự động từ dòng tiêu đề của file.
+3. Chỉ khi **sang năm học mới** (ngày bắt đầu tuần 1 thay đổi) mới cần thêm `--week1`:
+   ```sh
+   python3 build_data.py --week1 2027-09-06   # thứ Hai của tuần 1
+   ```
+   Những lần sau script tự dùng lại ngày này. Không cần sửa `index.html`.
 4. Commit rồi push lên `main`. GitHub Pages sẽ tự cập nhật sau khoảng một phút.
 
 ## Cách tính
 
-- Tuần hiện tại được tính từ `WEEK1` (kỳ 20261: thứ Hai 07/09/2026). Một phòng bị coi là "đang học" nếu có lớp đúng thứ, đúng tuần và đúng khung giờ.
+- Tuần hiện tại được tính từ ngày bắt đầu tuần 1 (năm học 2026–2027: thứ Hai 07/09/2026). Một phòng bị coi là "đang học" nếu có lớp đúng thứ, đúng tuần và đúng khung giờ.
 - Chỉ tính phòng học có mã dạng Tòa-Số (D9-102, C7-E303, C10B-205…). Sân, SVĐ, bể bơi và lớp Online không được tính.
 - Lớp bị huỷ được bỏ qua.
 - App chỉ biết những gì có trong TKB. Họp, thi hay mượn phòng đột xuất không có trong dữ liệu, nên "trống" chỉ có nghĩa là không có lớp theo lịch.

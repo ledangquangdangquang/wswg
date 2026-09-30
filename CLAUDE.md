@@ -13,9 +13,10 @@ Web tĩnh cho biết phòng học nào đang có lớp, phòng nào trống, d�
 
 ```sh
 python3 build_data.py "TKB20261-FULL.xlsx"   # không truyền tham số thì lấy file TKB* mới nhất
+python3 build_data.py --week1 2027-09-06     # chỉ khi đổi năm học
 ```
 
-Sang kỳ mới thì sửa 2 hằng số đầu `<script>` trong `index.html`: `WEEK1` (thứ Hai của tuần 1) và `SOURCE`.
+Không còn cấu hình nào trong `index.html`. `data.js` chứa `term` và `updated` (regex bám vào số ở dòng tiêu đề, nên đọc được cả CSV mất dấu) cùng `week1` (lấy từ `--week1`, không truyền thì dùng lại giá trị trong `data.js` cũ, và phải là thứ Hai). `index.html` tạo `WEEK1` và `SOURCE` từ các giá trị này.
 
 ## Dữ liệu TKB: những điểm cần biết
 

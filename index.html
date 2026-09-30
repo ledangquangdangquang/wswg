@@ -238,8 +238,10 @@ footer { padding: var(--space-lg) 0 var(--space-xl); font-size: var(--text-sm); 
 
 <script src="data.js"></script>
 <script>
-const WEEK1 = new Date(2026, 8, 7);            // Thứ Hai tuần 1, kỳ 20261
-const SOURCE = 'TKB 20261 · cập nhật 11.09.2026';
+// term, updated, week1 do build_data.py ghi vào data.js; không sửa tay ở đây
+const [wy, wm, wd] = window.TKB.week1.split('-').map(Number);
+const WEEK1 = new Date(wy, wm - 1, wd);            // thứ Hai tuần 1, giờ địa phương
+const SOURCE = `TKB ${window.TKB.term} · cập nhật ${window.TKB.updated}`;
 const ISSUES = 'https://github.com/ledangquangdangquang/wswg/issues/new';  // nút "Báo sai" mở issue điền sẵn
 const DAY = 864e5;
 
