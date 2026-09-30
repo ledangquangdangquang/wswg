@@ -7,6 +7,7 @@ Web tĩnh cho biết phòng học nào đang có lớp, phòng nào trống, d�
 - `TKB*.xlsx`: file TKB gốc, là nguồn dữ liệu duy nhất. Dùng thẳng file xlsx, không chuyển qua CSV.
 - `build_data.py`: đọc TKB (.xlsx, hoặc .csv) rồi ghi ra `data.js` (`window.TKB = {rooms, sessions}`). Chỉ dùng stdlib, không cần cài gì.
 - `data.js`: file sinh ra, **không sửa tay**.
+- `maps-hust.webp`: ảnh bản đồ trường, hiện trong popup `#map` khi bấm nút "Bản đồ" cạnh nút Sáng/Tối. Ảnh gốc là PNG, đổi sang webp bằng `ffmpeg -i in.png -c:v libwebp -quality 80 maps-hust.webp` (máy không có cwebp).
 - `index.html`: toàn bộ UI (HTML, CSS và JS nằm chung một file, không build step). Mở trực tiếp bằng `file://` hoặc đưa lên GitHub Pages đều chạy.
 
 ## Cập nhật TKB
@@ -41,4 +42,6 @@ Thiết kế theo skill Hallmark. Genre là editorial (thiên về công cụ), 
 - Màu và font chỉ dùng token trong `:root`, không hard-code giá trị. Dark mode khai báo lại các token màu ở hai chỗ, `@media (prefers-color-scheme: dark)` và `:root[data-theme="dark"]`, nên khi thêm token màu mới phải thêm vào cả 3 khối. Theme người dùng chọn được lưu trong `localStorage.theme`.
 - Font: Be Vietnam Pro (toàn bộ chữ), JetBrains Mono (mã phòng, giờ). Không dùng nhãn mono in hoa giãn chữ.
 - Accent đỏ son chỉ dùng cho vạch giờ đang xem, số phòng trống, viền thông báo và focus ring. Trạng thái luôn có chữ đi kèm, không để màu tự báo nghĩa.
+- Ô "Mã học phần" (`#hp`): có nội dung thì `render()` gọi `renderCourse()` thay cho danh sách phòng. Hàm này liệt kê các lớp có mã HP (`s[5]`) bắt đầu bằng chuỗi đã gõ, không phân biệt hoa thường, tối đa 30 lớp, gom theo mã lớp (`byClass`, mã lớp là `s[8]`). Mỗi buổi hiện thứ, giờ, phòng và tuần (`weekText()` đổi bitmask thành `2-9, 11-18`). Các bộ lọc tòa, phòng và trạng thái không áp dụng khi tìm HP.
+- Popup dùng `<dialog>` + `.dlg-head` chung: `#dlg` là lịch cả ngày của một phòng, `#map` là bản đồ (rộng hơn, tối đa 960px). Cả hai đóng bằng nút Đóng, Esc hoặc bấm ra ngoài.
 - Bố cục phải chạy được ở độ rộng 320px, không có scroll ngang.

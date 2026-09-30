@@ -226,6 +226,8 @@ dialog::backdrop { background: var(--color-scrim); }
 #map { width: min(960px, calc(100% - 2 * var(--space-md))); }
 #map img { display: block; width: 100%; height: auto; }
 .acts { display: flex; gap: var(--space-sm); }
+.bld > p { margin: var(--space-xs) 0 0; color: var(--color-ink-2); }
+.day .c b { font: 600 var(--text-sm)/1.5 var(--font-mono); }
 .report { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-sm); padding: var(--space-md); border-top: 1px solid var(--color-rule); font-size: var(--text-sm); color: var(--color-neutral); }
 
 footer { padding: var(--space-xl) 0; font-size: var(--text-sm); color: var(--color-neutral); }
@@ -253,6 +255,7 @@ footer { padding: var(--space-xl) 0; font-size: var(--text-sm); color: var(--col
     <button type="button" class="btn" id="now">Về hiện tại</button>
     <div class="field"><label for="bld">Tòa nhà</label><select id="bld"><option value="">Tất cả tòa</option></select></div>
     <div class="field"><label for="q">Tìm phòng</label><input type="search" id="q" placeholder="VD: D9-5" autocomplete="off"></div>
+    <div class="field"><label for="hp">Mã học phần</label><input type="search" id="hp" placeholder="VD: IT3040" autocomplete="off"></div>
     <div class="seg" role="radiogroup" aria-label="Lọc trạng thái">
       <label><input type="radio" name="st" value="free" checked><span>Trống</span></label>
       <label><input type="radio" name="st" value="busy"><span>Có lớp</span></label>
@@ -306,7 +309,8 @@ const pct = m => ((Math.min(Math.max(m, T0), T1) - T0) / (T1 - T0) * 100).toFixe
 const { rooms, sessions } = window.TKB;
 const building = r => r.slice(0, r.lastIndexOf('-'));
 const hm = m => String(m / 60 | 0).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
-const byRoom = rooms.map(() => []);
+const byRoom = rooms.map(() => []), byClass = new Map();
+for (const s of sessions) byClass.has(s[8]) ? byClass.get(s[8]).push(s) : byClass.set(s[8], [s]);
 for (const s of sessions) byRoom[s[0]].push(s);
 // Tòa bắt đầu bằng chữ (D9, C7…) lên trước, cơ sở ngoài (15B-TQBuu…) xuống cuối
 const offsite = r => /^\d/.test(r) ? 1 : 0;
@@ -335,6 +339,40 @@ const inWeek = (s, week) => week >= 1 && Math.floor(s[4] / 2 ** week) % 2 === 1;
 // Các buổi của 1 phòng trong ngày đang xem, theo giờ bắt đầu
 const daySessions = (i, thu, week) =>
   byRoom[i].filter(s => s[1] === thu && inWeek(s, week)).sort((a, b) => a[2] - b[2] || a[3] - b[3]);
+
+// Bitmask tuần -> "2-9, 11-18"
+function weekText(s) {
+  const out = [];
+  for (let w = 1; w < 64; w++) {
+    if (!inWeek(s, w)) continue;
+    let e = w; while (inWeek(s, e + 1)) e++;
+    out.push(e > w ? `${w}-${e}` : `${w}`); w = e;
+  }
+  return out.join(', ');
+}
+
+// Tìm theo mã HP (khớp phần đầu): lịch cả tuần của từng lớp thuộc HP đó, thay cho danh sách phòng
+function renderCourse(q) {
+  const { thu, week, t } = ctx;
+  const hp = c => byClass.get(c)[0][5];
+  const codes = [...byClass.keys()].filter(c => hp(c).toUpperCase().startsWith(q))
+    .sort((a, b) => hp(a).localeCompare(hp(b)) || a.localeCompare(b));
+  const shown = codes.slice(0, 30);  // HP đông nhất có ~200 lớp, gõ vài ký tự thì khớp cả nghìn
+  $('headline').innerHTML = codes.length ? `<b>${codes.length}</b> lớp khớp` : 'Không thấy lớp';
+  $('sub').textContent = codes.length > shown.length ? `hiện ${shown.length} lớp đầu, gõ thêm để thu hẹp` : `tuần ${week}`;
+  $('list').innerHTML = shown.length ? shown.map(c => {
+    const list = byClass.get(c).slice().sort((a, b) => a[1] - b[1] || a[2] - b[2]), s0 = list[0];
+    return `<section class="bld">
+      <div class="bld-head"><h2>Lớp ${esc(c)}<small>${esc(s0[5])} · ${esc(s0[7])}</small></h2></div>
+      <p>${esc(s0[6])}</p>
+      <ul class="day">${list.map(s => {
+        const now = s[1] === thu && inWeek(s, week) && s[2] <= t && t < s[3];
+        return `<li class="${now ? 'now' : ''}"><time>${hm(s[2])}–${hm(s[3])}</time>
+          <div class="c">${s[1] === 8 ? 'Chủ nhật' : 'Thứ ' + s[1]} · <b>${esc(rooms[s[0]])}</b>${now ? ' · đang học' : ''}
+          <small>tuần ${weekText(s)}${inWeek(s, week) ? '' : ` · không học tuần ${week}`}</small></div></li>`;
+      }).join('')}</ul></section>`;
+  }).join('') : `<p class="empty">Không có học phần nào có mã bắt đầu bằng “${esc(q)}”.</p>`;
+}
 
 // Trạng thái tại phút t: {busy, cls, until}
 function statusOf(day, t) {
@@ -367,6 +405,8 @@ function render() {
   const js = d.getDay(), thu = js === 0 ? 8 : js + 1, week = weekOf(d), t = d.getHours() * 60 + d.getMinutes();
   const dayName = thu === 8 ? 'Chủ nhật' : 'Thứ ' + thu;
   ctx = { thu, week, t, dayName, date: d.toLocaleDateString('vi-VN') };
+  const hq = $('hp').value.trim().toUpperCase();
+  if (hq) return renderCourse(hq);
 
   // Ngoài khoảng tuần của TKB: không có dữ liệu, đừng báo "trống hết"
   const [w0, w1] = window.TKB.weeks;
