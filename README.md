@@ -20,7 +20,7 @@ Xem nhanh phòng học nào ở Bách khoa đang có lớp và phòng nào đang
 
 <p align="center">
   <img src="screenshots/day.webp" width="62%" alt="Lịch cả ngày của phòng D9-102">
-  <img src="screenshots/dark.webp" width="30%" alt="Giao diện tối trên điện thoại">
+  <!-- <img src="screenshots/dark.webp" width="30%" alt="Giao diện tối trên điện thoại"> -->
 </p>
 
 ![Tìm các lớp của học phần IT3040](screenshots/hp.webp)
