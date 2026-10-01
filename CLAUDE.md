@@ -4,8 +4,8 @@ Web tĩnh cho biết phòng học nào đang có lớp, phòng nào trống, d�
 
 ## Cấu trúc
 
-- `TKB*.xlsx`: file TKB gốc, là nguồn dữ liệu duy nhất. Dùng thẳng file xlsx, không chuyển qua CSV.
-- `build_data.py`: đọc TKB (.xlsx, hoặc .csv) rồi ghi ra `data.js` (`window.TKB = {rooms, sessions}`). Chỉ dùng stdlib, không cần cài gì.
+- `TKB*.xlsx`: file TKB gốc, là nguồn dữ liệu duy nhất. Chỉ đọc .xlsx.
+- `build_data.py`: đọc TKB (.xlsx) rồi ghi ra `data.js` (`window.TKB = {rooms, sessions}`). Chỉ dùng stdlib, không cần cài gì.
 - `data.js`: file sinh ra, **không sửa tay**.
 - `maps-hust.webp`: ảnh bản đồ trường, hiện trong popup `#map` khi bấm nút "Bản đồ" cạnh nút Sáng/Tối. Ảnh gốc là PNG, đổi sang webp bằng `ffmpeg -i in.png -c:v libwebp -quality 80 maps-hust.webp` (máy không có cwebp).
 - `index.html`: toàn bộ UI (HTML, CSS và JS nằm chung một file, không build step). Mở trực tiếp bằng `file://` hoặc đưa lên GitHub Pages đều chạy.
@@ -17,18 +17,17 @@ python3 build_data.py "TKB20261-FULL.xlsx"   # không truyền tham số thì l�
 python3 build_data.py --week1 2027-09-06     # chỉ khi đổi năm học
 ```
 
-Không còn cấu hình nào trong `index.html`. `data.js` chứa `term` và `updated` (regex bám vào số ở dòng tiêu đề, nên đọc được cả CSV mất dấu) cùng `week1` (lấy từ `--week1`, không truyền thì dùng lại giá trị trong `data.js` cũ, và phải là thứ Hai). `index.html` tạo `WEEK1` và `SOURCE` từ các giá trị này. `weeks: [đầu, cuối]` là khoảng tuần có lớp. Ngoài khoảng này `render()` hiện `.notice` và không liệt kê phòng. `exam` là danh sách tuần thi, lấy từ `--exam-weeks` hoặc do `exam_weeks()` đoán (tuần có < 30% số lớp của tuần đông nhất, nằm sau tuần học đầu tiên). Tuần thi vẫn liệt kê phòng như thường nhưng thêm `.notice.exam` ở đầu danh sách. Khác với `week1`, `exam` không được giữ lại giữa các lần build.
+Không còn cấu hình nào trong `index.html`. `data.js` chứa `term` và `updated` (regex bám vào số ở dòng tiêu đề) cùng `week1` (lấy từ `--week1`, không truyền thì dùng lại giá trị trong `data.js` cũ, và phải là thứ Hai). `index.html` tạo `WEEK1` và `SOURCE` từ các giá trị này. `weeks: [đầu, cuối]` là khoảng tuần có lớp. Ngoài khoảng này `render()` hiện `.notice` và không liệt kê phòng. `exam` là danh sách tuần thi, lấy từ `--exam-weeks` hoặc do `exam_weeks()` đoán (tuần có < 30% số lớp của tuần đông nhất, nằm sau tuần học đầu tiên). Tuần thi vẫn liệt kê phòng như thường nhưng thêm `.notice.exam` ở đầu danh sách. Khác với `week1`, `exam` không được giữ lại giữa các lần build.
 - Đếm lượt truy cập: đặt hằng số `GOATCOUNTER` trong `index.html` (để trống thì tắt). Tổng lượt xem lấy từ `/counter/TOTAL.json` và hiện ở footer.
 
 ## Dữ liệu TKB: những điểm cần biết
 
-- Cột theo chỉ số (0-based): 2 Mã lớp, 4 Mã HP, 5 Tên HP, 10 Thứ (2–7, 8 = CN), 11 Thời gian `HHMM-HHMM`, 15 Tuần, 16 Phòng, 20 Trạng thái, 21 Loại lớp.
-- Chỉ lấy dòng có cột 0 là số, tức là bỏ 2 dòng tiêu đề và dòng header.
+- Cột được tìm theo tên ở dòng header (`COLS`, `columns()`), không theo vị trí: Mã_lớp, Mã_HP, Tên_HP, Thứ (2–7, 8 = CN), Thời_gian `HHMM-HHMM`, Tuần, Phòng, Trạng_thái, Loại_lớp. Thiếu cột nào thì script dừng và báo tên cột đó.
+- Chỉ lấy dòng có Mã_lớp là số, tức là bỏ 2 dòng tiêu đề và dòng header.
 - Tuần viết không thống nhất, ví dụ `2-9,11-18`, `15.17`, `4, 6, 13`, `4,7,11,13,`. Vì vậy `weeks()` parse bằng regex. Trong `data.js`, tuần được lưu thành bitmask (`1 << tuần`).
 - Bỏ các lớp có trạng thái "Huỷ lớp" và các dòng có giá trị `NULL`.
-- Chỉ tính phòng học khớp `ROOM_RE`, tức dạng `<tòa>-<số>` như D9-102, C7-E303, C10B-205, NhaT-KT-205, GĐ-B1. Sân, SVĐ, bể bơi, Online, `TTB4` và phòng không có số đều bị loại. Muốn xem danh sách phòng bị loại thì in các giá trị cột 16 không khớp regex. Tòa được lấy từ phần đứng trước dấu `-` cuối cùng.
-- Script đọc được `.xlsx` bằng stdlib (`read_xlsx`, dò theo tham chiếu ô vì các ô trống bị bỏ qua). Nên ưu tiên file này.
-- CSV hiện tại xuất ra Windows-1252 nên đã mất dấu tiếng Việt (có ký tự `?` thật ở trong file, không khôi phục được). Script thử UTF-8 trước, không được thì fallback sang cp1252. Khi tên có `?`, `name()` dùng tên tiếng Anh (cột 6) thay thế.
+- Chỉ tính phòng học khớp `ROOM_RE`, tức dạng `<tòa>-<số>` như D9-102, C7-E303, C10B-205, NhaT-KT-205, GĐ-B1. Sân, SVĐ, bể bơi, Online, `TTB4` và phòng không có số đều bị loại. Muốn xem danh sách phòng bị loại thì in các giá trị cột Phòng không khớp regex. Tòa được lấy từ phần đứng trước dấu `-` cuối cùng.
+- Script đọc được `.xlsx` bằng stdlib (`read_xlsx`, dò theo tham chiếu ô vì các ô trống bị bỏ qua).
 - Số tuần là tuần của năm học (kỳ 1: 2–18, kỳ hè: 45–49), được lưu thành bitmask và có thể vượt 2^31. Trong JS phải dùng `inWeek()`, không dùng `&`.
 
 ## Kiểm tra

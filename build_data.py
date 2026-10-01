@@ -1,12 +1,11 @@
-"""Thời khóa biểu (.xlsx hoặc .csv) -> data.js (window.TKB) cho index.html.
+"""Thời khóa biểu (.xlsx) -> data.js (window.TKB) cho index.html.
 
-Chạy: python3 build_data.py [file.xlsx|file.csv] [--week1 YYYY-MM-DD]
+Chạy: python3 build_data.py [file.xlsx] [--week1 YYYY-MM-DD]
   file     mặc định: file TKB* mới nhất trong thư mục
   --week1  thứ Hai của tuần 1; bỏ trống thì giữ giá trị trong data.js cũ
 Kỳ và ngày cập nhật lấy tự động từ dòng tiêu đề của file.
-Nên dùng .xlsx: chữ luôn là Unicode, không bị mất dấu như CSV xuất sai encoding.
 """
-import argparse, csv, datetime, glob, json, os, re, zipfile
+import argparse, datetime, glob, json, os, re, zipfile
 import xml.etree.ElementTree as ET
 
 # Phòng học = <tòa>-<số phòng>: D9-102, D3-5-301, C7-E303, C10B-205, NhaT-KT-205, GĐ-B1, Nha A-101.
@@ -52,21 +51,8 @@ def read_xlsx(path):
     return rows
 
 
-def read_table(path):
-    """Mọi dòng của file (cả tiêu đề)."""
-    if path.lower().endswith(".xlsx"):
-        return read_xlsx(path)
-    raw = open(path, "rb").read()
-    try:
-        text = raw.decode("utf-8-sig")
-    except UnicodeDecodeError:
-        text = raw.decode("cp1252", errors="replace")  # bản xuất cũ, mất dấu
-    return list(csv.reader(text.splitlines()))
-
-
 def title_info(table):
-    """'THỜI KHÓA BIỂU KỲ 20261 - CẬP NHẬT NGÀY 11.09.2026' -> ('20261', '11.09.2026').
-    Chỉ bám vào số nên vẫn đọc được tiêu đề CSV mất dấu."""
+    """'THỜI KHÓA BIỂU KỲ 20261 - CẬP NHẬT NGÀY 11.09.2026' -> ('20261', '11.09.2026')."""
     title = next((r[0] for r in table if r and r[0].strip()), "")
     m = re.search(r"(\d{5})\D+?(\d{1,2}\.\d{1,2}\.\d{4})", title)
     if not m:
@@ -81,10 +67,18 @@ def old_week1(path="data.js"):
         return None
 
 
-def name(r):
-    """Tên HP; nếu đã mất dấu (CSV xuất sai encoding) thì dùng tên tiếng Anh."""
-    vi = r[5]
-    return r[6] if ("?" in vi or "\ufffd" in vi) and r[6] else vi
+COLS = ["Mã_lớp", "Mã_HP", "Tên_HP", "Thứ", "Thời_gian", "Tuần", "Phòng", "Trạng_thái", "Loại_lớp"]
+
+
+def columns(table):
+    """Tên cột -> chỉ số, tìm theo dòng header để không vỡ khi trường thêm / bớt cột."""
+    for r in table:
+        if "Mã_HP" in r:
+            missing = [c for c in COLS if c not in r]
+            if missing:
+                raise SystemExit(f"Header thiếu cột: {', '.join(missing)}")
+            return {c: r.index(c) for c in COLS}
+    raise SystemExit("Không tìm thấy dòng header (có cột Mã_HP)")
 
 
 def exam_weeks(sessions):
@@ -100,16 +94,19 @@ def exam_weeks(sessions):
 
 
 def build(rows):
+    c = columns(rows)
+    n = max(c.values()) + 1
     rooms, sessions = {}, []
     for r in rows:
-        if len(r) < 22 or not r[0].isdigit():  # bỏ tiêu đề, header, dòng trống
+        if len(r) < n or not r[c["Mã_lớp"]].isdigit():  # bỏ tiêu đề, header, dòng trống
             continue
-        thu, time, wk, room, status = r[10], r[11], r[15], r[16].strip(), r[20]
+        thu, time, wk, room, status = (r[c[k]] for k in ("Thứ", "Thời_gian", "Tuần", "Phòng", "Trạng_thái"))
+        room = room.strip()
         if not ROOM_RE.match(room) or "NULL" in (thu, time, wk) or status.startswith("Hu"):  # bỏ lớp Huỷ
             continue
         start, _, end = time.partition("-")
         idx = rooms.setdefault(room, len(rooms))
-        sessions.append([idx, int(thu), minutes(start), minutes(end), sum(1 << w for w in set(weeks(wk))), r[4], name(r), r[21], r[2]])
+        sessions.append([idx, int(thu), minutes(start), minutes(end), sum(1 << w for w in set(weeks(wk))), r[c["Mã_HP"]], r[c["Tên_HP"]], r[c["Loại_lớp"]], r[c["Mã_lớp"]]])
     names = sorted(rooms, key=rooms.get)
     mask = 0
     for s in sessions:
@@ -127,14 +124,15 @@ if __name__ == "__main__":
     fake = lambda w, n: [[0, 2, 0, 1, 1 << w]] * n
     assert exam_weeks(fake(1, 2) + fake(2, 100) + fake(3, 90) + fake(4, 10) + fake(5, 95) + fake(6, 20)) == [4, 6]
     assert title_info([[""], ["THỜI KHÓA BIỂU KỲ 20261 - CẬP NHẬT NGÀY 11.09.2026"]]) == ("20261", "11.09.2026")
-    assert title_info([["TH?I KH\ufffdA BI?U K? 20261 - C?P NH?T NG\ufffdY 1.9.2026"]]) == ("20261", "1.9.2026")
+    hdr = ["Kỳ", "Mã_lớp", "Mã_lớp_kèm", "Mã_HP", "Tên_HP", "Tên_HP_Tiếng_Anh", "Thứ", "Thời_gian", "Tuần", "Phòng", "Trạng_thái", "Loại_lớp"]
+    assert columns([["tiêu đề"], hdr])["Mã_lớp"] == 1
 
     ap = argparse.ArgumentParser(description="Thời khóa biểu -> data.js")
     ap.add_argument("file", nargs="?")
     ap.add_argument("--week1", help="thứ Hai của tuần 1, dạng YYYY-MM-DD")
     ap.add_argument("--exam-weeks", help="tuần thi, vd '10,19-20'; bỏ trống thì tự đoán từ số lớp mỗi tuần")
     args = ap.parse_args()
-    path = args.file or max(glob.glob("TKB*.xlsx") + glob.glob("TKB*.csv"), key=os.path.getmtime)
+    path = args.file or max(glob.glob("TKB*.xlsx"), key=os.path.getmtime)
 
     week1 = args.week1 or old_week1()
     if not week1:
@@ -142,7 +140,7 @@ if __name__ == "__main__":
     if datetime.date.fromisoformat(week1).weekday() != 0:
         raise SystemExit(f"--week1 {week1} không phải thứ Hai")
 
-    table = read_table(path)
+    table = read_xlsx(path)
     term, updated = title_info(table)
     data = {"term": term, "updated": updated, "week1": week1, **build(table)}
     data["exam"] = weeks(args.exam_weeks) if args.exam_weeks else exam_weeks(data["sessions"])
