@@ -18,11 +18,8 @@ Xem nhanh phòng học nào ở Bách khoa đang có lớp và phòng nào đang
 - Lọc theo tòa nhà, tìm theo mã phòng (ví dụ `D9-5`), lọc theo Trống / Đang học.
 - Giao diện sáng hoặc tối: mặc định theo hệ thống, đổi được bằng nút mặt trời / mặt trăng trên thanh đầu trang.
 
-<p align="center">
-  <img src="screenshots/day.webp" width="62%" alt="Lịch cả ngày của phòng D9-102">
-  <!-- <img src="screenshots/dark.webp" width="30%" alt="Giao diện tối trên điện thoại"> -->
-</p>
 
+![Lịch cả ngày của phòng D9-102](screenshots/day.webp)
 ![Tìm các lớp của học phần IT3040](screenshots/hp.webp)
 
 ## Chạy ở máy
