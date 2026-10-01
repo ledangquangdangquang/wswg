@@ -8,6 +8,7 @@ Web tĩnh cho biết phòng học nào đang có lớp, phòng nào trống, d�
 - `build_data.py`: đọc TKB (.xlsx) rồi ghi ra `data.js` (`window.TKB = {rooms, sessions}`). Chỉ dùng stdlib, không cần cài gì.
 - `data.js`: file sinh ra, **không sửa tay**.
 - `maps-hust.webp`: ảnh bản đồ trường, hiện trong popup `#map` khi bấm nút "Bản đồ" cạnh nút sáng/tối (icon mặt trời/mặt trăng). Ảnh gốc là PNG, đổi sang webp bằng `ffmpeg -i in.png -c:v libwebp -quality 80 maps-hust.webp` (máy không có cwebp).
+- `screenshots/*.webp`: ảnh cho README. Chụp bằng `firefox --headless --no-remote --profile <thư mục tạm> --window-size=1280,900 --screenshot out.png file://...` trên một bản sao `index.html` có thêm `data-theme` và một đoạn script đặt `#at`, tòa, bộ lọc (máy không có Chrome). Sau đó đổi sang webp bằng ffmpeg như trên.
 - `index.html`: toàn bộ UI (HTML, CSS và JS nằm chung một file, không build step). Mở trực tiếp bằng `file://` hoặc đưa lên GitHub Pages đều chạy.
 
 ## Cập nhật TKB

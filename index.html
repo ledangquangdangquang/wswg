@@ -224,7 +224,7 @@ dialog::backdrop { background: var(--color-scrim); }
 .day .c small { display: block; font-size: var(--text-xs); color: var(--color-neutral); }
 .day li.now { box-shadow: inset 3px 0 0 var(--color-accent); background: var(--color-accent-soft); }
 .day li.past { opacity: 0.5; }
-.day .none { display: block; color: var(--color-neutral); }
+.day .none { grid-column: 1 / -1; color: var(--color-neutral); }
 #map { width: min(960px, calc(100% - 2 * var(--space-md))); }
 #map img { display: block; width: 100%; height: auto; }
 .acts { display: flex; gap: var(--space-sm); }

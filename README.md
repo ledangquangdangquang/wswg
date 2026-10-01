@@ -4,15 +4,26 @@ Xem nhanh phòng học nào ở Bách khoa đang có lớp và phòng nào đang
 
 **Dùng ngay:** https://ledangquangdangquang.github.io/wswg/
 
+![Dòng thời gian các phòng tòa D9 lúc 10:00 thứ Hai](screenshots/light.webp)
+
 ## Tính năng
 
 - Số phòng trống ngay lúc này, tự cập nhật mỗi phút.
 - Mỗi phòng ghi rõ "Trống · đến 14:10" hoặc "Đang học · đến 11:45", kèm tên môn.
 - Bấm vào một phòng để xem lịch cả ngày của phòng đó.
+- Gõ mã học phần (ví dụ `IT3040`) để xem các lớp của môn đó học thứ mấy, giờ nào, phòng nào.
+- Nút **Bản đồ** mở bản đồ trường để tìm tòa nhà.
 - Thấy app báo sai thì bấm **Báo sai** trong lịch phòng. Nút này mở một GitHub Issue điền sẵn phòng, giờ, app báo gì và thực tế ra sao (cần tài khoản GitHub). Danh sách báo sai xem ở [Issues](https://github.com/ledangquangdangquang/wswg/issues?q=%5BB%C3%A1o+sai%5D).
 - Chọn giờ khác trong ô "Xem lúc" để xem trước, ví dụ chiều mai phòng nào trống.
 - Lọc theo tòa nhà, tìm theo mã phòng (ví dụ `D9-5`), lọc theo Trống / Đang học.
-- Giao diện sáng hoặc tối: mặc định theo hệ thống, đổi được bằng nút trên thanh đầu trang.
+- Giao diện sáng hoặc tối: mặc định theo hệ thống, đổi được bằng nút mặt trời / mặt trăng trên thanh đầu trang.
+
+<p align="center">
+  <img src="screenshots/day.webp" width="62%" alt="Lịch cả ngày của phòng D9-102">
+  <img src="screenshots/dark.webp" width="30%" alt="Giao diện tối trên điện thoại">
+</p>
+
+![Tìm các lớp của học phần IT3040](screenshots/hp.webp)
 
 ## Chạy ở máy
 
@@ -20,7 +31,7 @@ Mở thẳng `index.html` bằng trình duyệt là chạy được, không cầ
 
 ## Cập nhật thời khóa biểu
 
-1. Chép file TKB vào thư mục này. **Nên dùng thẳng file `.xlsx`** vì file này không bao giờ bị lỗi dấu. Nếu dùng CSV thì phải lưu bằng *CSV UTF-8 (Comma delimited)*. Kiểu *CSV (Comma delimited)* thường sẽ biến chữ có dấu thành `?`, và khi đó app phải hiện tên môn bằng tiếng Anh.
+1. Chép file TKB `.xlsx` của trường vào thư mục này, giữ nguyên, không cần chuyển sang định dạng khác.
 2. Chạy:
    ```sh
    python3 build_data.py "TKB20261-FULL.xlsx"   # không truyền tên file thì lấy file TKB* mới nhất
@@ -51,3 +62,5 @@ Mở thẳng `index.html` bằng trình duyệt là chạy được, không cầ
 | `data.js` | Dữ liệu sinh từ file TKB, không sửa tay |
 | `build_data.py` | Chuyển file TKB thành `data.js` |
 | `TKB*.xlsx` | Thời khóa biểu gốc |
+| `maps-hust.webp` | Bản đồ trường |
+| `screenshots/` | Ảnh minh họa cho README |
