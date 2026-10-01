@@ -1,4 +1,4 @@
-# Phòng trống BK
+# Phòng trống HUST
 
 Xem nhanh phòng học nào ở Bách khoa đang có lớp và phòng nào đang trống, dựa trên thời khóa biểu kỳ 20261.
 
