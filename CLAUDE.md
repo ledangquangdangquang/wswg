@@ -7,8 +7,9 @@ Web tĩnh cho biết phòng học nào đang có lớp, phòng nào trống, d�
 - `TKB*.xlsx`: file TKB gốc, là nguồn dữ liệu duy nhất. Chỉ đọc .xlsx.
 - `build_data.py`: đọc TKB (.xlsx) rồi ghi ra `data.js` (`window.TKB = {rooms, sessions}`). Chỉ dùng stdlib, không cần cài gì.
 - `data.js`: file sinh ra, **không sửa tay**.
-- `maps-hust.webp`: ảnh bản đồ trường, hiện trong popup `#map` khi bấm nút "Bản đồ" cạnh nút sáng/tối (icon mặt trời/mặt trăng). Ảnh gốc là PNG, đổi sang webp bằng `ffmpeg -i in.png -c:v libwebp -quality 80 maps-hust.webp` (máy không có cwebp).
-- `screenshots/*.webp`: ảnh cho README. Chụp bằng `firefox --headless --no-remote --profile <thư mục tạm> --window-size=1280,900 --screenshot out.png file://...` trên một bản sao `index.html` có thêm `data-theme` và một đoạn script đặt `#at`, tòa, bộ lọc (máy không có Chrome). Sau đó đổi sang webp bằng ffmpeg như trên.
+- `maps-hust.webp`: ảnh bản đồ trường, hiện trong popup `#map` khi bấm nút bản đồ (icon) trên thanh đầu trang.
+- `favicon.svg`: icon tab, vẽ lại motif dòng thời gian (3 thanh + vạch đỏ son). Màu hex lấy từ token `--color-ink`, `--color-paper`, `--color-block`, `--color-accent`. Ảnh gốc là PNG, đổi sang webp bằng `ffmpeg -i in.png -c:v libwebp -quality 80 maps-hust.webp` (máy không có cwebp).
+- `screenshots/*.webp`: ảnh cho README. Chụp bằng `firefox --headless --no-remote --profile <thư mục tạm> --window-size=1280,900 --screenshot out.png file://...` trên một bản sao `index.html` có thêm `data-theme` và một đoạn script đặt `#at`, tòa, bộ lọc (máy không có Chrome). Sau đó đổi sang webp bằng ffmpeg như trên. Nếu Firefox chụp ra rỗng hoặc bị treo thì xóa thư mục profile rồi tạo lại. Trên máy này `cp`/`rm` là alias có `-i`, nên trong script phải gọi `command cp -f`.
 - `index.html`: toàn bộ UI (HTML, CSS và JS nằm chung một file, không build step). Mở trực tiếp bằng `file://` hoặc đưa lên GitHub Pages đều chạy.
 
 ## Cập nhật TKB
@@ -43,5 +44,6 @@ Thiết kế theo skill Hallmark. Genre là editorial (thiên về công cụ), 
 - Font: Be Vietnam Pro (toàn bộ chữ), JetBrains Mono (mã phòng, giờ). Không dùng nhãn mono in hoa giãn chữ.
 - Accent đỏ son chỉ dùng cho vạch giờ đang xem, số phòng trống, viền thông báo và focus ring. Trạng thái luôn có chữ đi kèm, không để màu tự báo nghĩa.
 - Ô "Mã học phần" (`#hp`): có nội dung thì `render()` gọi `renderCourse()` thay cho danh sách phòng. Hàm này liệt kê các lớp có mã HP (`s[5]`) bắt đầu bằng chuỗi đã gõ, không phân biệt hoa thường, tối đa 30 lớp, gom theo mã lớp (`byClass`, mã lớp là `s[8]`). Mỗi buổi hiện thứ, giờ, phòng và tuần (`weekText()` đổi bitmask thành `2-9, 11-18`). Các bộ lọc tòa, phòng và trạng thái không áp dụng khi tìm HP.
+- Thanh đầu trang có 3 nút: Bản đồ (chỉ icon), GitHub (`#gh`, icon + số sao) và sáng/tối (icon mặt trời/mặt trăng). Số sao lấy từ API GitHub (`REPO`) và cache 6 giờ trong `localStorage.stars`, vì API chỉ cho 60 lượt/giờ mỗi IP mà wifi trường dùng chung IP. Lấy không được thì chỉ hiện icon.
 - Popup dùng `<dialog>` + `.dlg-head` chung: `#dlg` là lịch cả ngày của một phòng, `#map` là bản đồ (rộng hơn, tối đa 960px). Cả hai đóng bằng nút Đóng, Esc hoặc bấm ra ngoài.
 - Bố cục phải chạy được ở độ rộng 320px, không có scroll ngang.

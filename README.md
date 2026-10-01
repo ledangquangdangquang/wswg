@@ -12,7 +12,7 @@ Xem nhanh phòng học nào ở Bách khoa đang có lớp và phòng nào đang
 - Mỗi phòng ghi rõ "Trống · đến 14:10" hoặc "Đang học · đến 11:45", kèm tên môn.
 - Bấm vào một phòng để xem lịch cả ngày của phòng đó.
 - Gõ mã học phần (ví dụ `IT3040`) để xem các lớp của môn đó học thứ mấy, giờ nào, phòng nào.
-- Nút **Bản đồ** mở bản đồ trường để tìm tòa nhà.
+- Nút bản đồ (icon tấm bản đồ) mở bản đồ trường để tìm tòa nhà.
 - Thấy app báo sai thì bấm **Báo sai** trong lịch phòng. Nút này mở một GitHub Issue điền sẵn phòng, giờ, app báo gì và thực tế ra sao (cần tài khoản GitHub). Danh sách báo sai xem ở [Issues](https://github.com/ledangquangdangquang/wswg/issues?q=%5BB%C3%A1o+sai%5D).
 - Chọn giờ khác trong ô "Xem lúc" để xem trước, ví dụ chiều mai phòng nào trống.
 - Lọc theo tòa nhà, tìm theo mã phòng (ví dụ `D9-5`), lọc theo Trống / Đang học.
@@ -63,4 +63,5 @@ Mở thẳng `index.html` bằng trình duyệt là chạy được, không cầ
 | `build_data.py` | Chuyển file TKB thành `data.js` |
 | `TKB*.xlsx` | Thời khóa biểu gốc |
 | `maps-hust.webp` | Bản đồ trường |
+| `favicon.svg` | Icon trên tab trình duyệt |
 | `screenshots/` | Ảnh minh họa cho README |

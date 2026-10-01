@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Phòng trống HUST</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -126,12 +127,15 @@ input:hover, select:hover, .btn:hover { border-color: var(--color-ink-2); }
 input:focus-visible, select:focus-visible, .btn:focus-visible, .seg input:focus-visible + span, .row:focus-visible {
   outline: 2px solid var(--color-focus); outline-offset: 2px;
 }
-.btn { width: auto; cursor: pointer; white-space: nowrap; }
+.btn { width: auto; cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; gap: var(--space-xs); }
 .btn:active { transform: translateY(1px); }
 .btn:disabled { opacity: 0.4; cursor: default; transform: none; border-color: var(--color-rule-2); }
-a.btn { display: inline-flex; align-items: center; text-decoration: none; }
-.btn.icon { width: 40px; padding: 0; display: inline-grid; place-items: center; }
-.btn.icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+a.btn { text-decoration: none; }
+.btn.icon { width: 40px; padding: 0; }
+.btn svg { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.btn svg.fill { fill: currentColor; stroke: none; }
+#stars:empty { display: none; }
+@media (max-width: 480px) { .acts { gap: var(--space-xs); } .nav .wrap { gap: var(--space-sm); } .mark { white-space: normal; line-height: 1.25; } }
 
 .seg { display: flex; border: 1px solid var(--color-rule-2); border-radius: var(--radius-sm); overflow: hidden; height: 40px; flex: 1 1 240px; }
 .seg label { flex: 1; display: flex; position: relative; }
@@ -241,7 +245,8 @@ footer { padding: var(--space-xl) 0; font-size: var(--text-sm); color: var(--col
 <header class="nav"><div class="wrap">
   <div class="mark">Phòng trống HUST</div>
   <div class="acts">
-    <button type="button" class="btn" id="map-open">Bản đồ</button>
+    <button type="button" class="btn icon" id="map-open" aria-label="Bản đồ trường" title="Bản đồ trường"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.1 5.6a2 2 0 0 0 1.8 0l3.6-1.9A1 1 0 0 1 21 4.6v12.8a1 1 0 0 1-.6.9l-4.5 2.3a2 2 0 0 1-1.8 0l-4.2-2.1a2 2 0 0 0-1.8 0l-3.6 1.8A1 1 0 0 1 3 19.4V6.6a1 1 0 0 1 .6-.9l4.5-2.3a2 2 0 0 1 1.8 0z"/><path d="M15 5.8v15M9 3.2v15"/></svg></button>
+    <a class="btn" id="gh" href="https://github.com/ledangquangdangquang/wswg" target="_blank" rel="noopener" aria-label="Mã nguồn trên GitHub"><svg class="fill" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0c4.42 0 8 3.58 8 8a8.01 8.01 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A8 8 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg><span id="stars"></span></a>
     <button type="button" class="btn icon" id="theme"></button>
   </div>
 </div></header>
@@ -302,7 +307,8 @@ footer { padding: var(--space-xl) 0; font-size: var(--text-sm); color: var(--col
 const [wy, wm, wd] = window.TKB.week1.split('-').map(Number);
 const WEEK1 = new Date(wy, wm - 1, wd);            // thứ Hai tuần 1, giờ địa phương
 const SOURCE = `TKB ${window.TKB.term} · cập nhật ${window.TKB.updated}`;
-const ISSUES = 'https://github.com/ledangquangdangquang/wswg/issues/new';  // nút "Báo sai" mở issue điền sẵn
+const REPO = 'https://github.com/ledangquangdangquang/wswg';
+const ISSUES = REPO + '/issues/new';  // nút "Báo sai" mở issue điền sẵn
 const GOATCOUNTER = 'wswg345';  // tên site GoatCounter (xxx trong xxx.goatcounter.com); để trống = không đếm
 const DAY = 864e5;
 const T0 = 6 * 60, T1 = 22 * 60;                  // khung dòng thời gian 6:00–22:00
@@ -519,6 +525,19 @@ if (GOATCOUNTER) {
     .then(j => { $('foot').textContent += ` · ${j.count} lượt xem`; })
     .catch(() => {});  // không lấy được số thì thôi, không ảnh hưởng app
 }
+// Số sao GitHub. Nhớ 6 giờ: API cho 60 lượt/giờ mỗi IP, mà cả wifi trường dùng chung IP.
+(async () => {
+  let c = null;
+  try { c = JSON.parse(localStorage.getItem('stars')); } catch {}
+  if (!c || Date.now() - c.t > 6 * 3600e3) {
+    try {
+      const r = await fetch(REPO.replace('github.com', 'api.github.com/repos'));
+      if (r.ok) c = { n: (await r.json()).stargazers_count, t: Date.now() };
+      localStorage.setItem('stars', JSON.stringify(c));
+    } catch {}
+  }
+  if (c) { $('stars').textContent = c.n; $('gh').setAttribute('aria-label', `Mã nguồn trên GitHub, ${c.n} sao`); }
+})();
 $('at').addEventListener('input', () => { live = false; render(); });
 $('now').addEventListener('click', () => { live = true; render(); });
 $('controls').addEventListener('input', e => { if (e.target.id !== 'at') render(); });
